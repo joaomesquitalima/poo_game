@@ -1,11 +1,15 @@
 import pygame,sys
-
+import time
 pygame.init()
 
 largura_janela, altura_janela = 1280,720
 janela = pygame.display.set_mode((largura_janela,altura_janela))
 fonte = pygame.font.Font(None, 36) 
 fonte_nome = pygame.font.Font(None,100)
+
+menu_selection = pygame.mixer.Sound('menu_selection.wav')
+cursor_select = pygame.mixer.Sound("cursor_select.wav")
+cursor_back = pygame.mixer.Sound("cursor_back.wav")
 
 
 
@@ -29,15 +33,26 @@ class Bloco():
 clock = pygame.time.Clock()
 
 
-x =50
-y = 200
-bloco = Bloco(x,y, id=1)
+
+
 
 velocidade = 10
 
 paredes_fase1 = [
     pygame.Rect(10, 40, 20, 600),
     pygame.Rect(10, 40, 800, 20),
+
+    pygame.Rect(0, 615, 800, 20),
+    pygame.Rect(780, 40, 20, 600),
+
+
+]
+
+paredes_fase2 = [
+    pygame.Rect(10, 40, 20, 600),
+    pygame.Rect(10, 40, 800, 20),
+
+    pygame.Rect(400,80,40,500),
 
     pygame.Rect(0, 615, 800, 20),
     pygame.Rect(780, 40, 20, 600),
@@ -74,12 +89,15 @@ def menu():
                 if event.key == pygame.K_SPACE and indice == 0:
                     fase1()
                 if event.key == pygame.K_SPACE and indice == 2:
+                    cursor_select.play()
                     tchau()
                 if event.key == pygame.K_s:
+                    menu_selection.play()
                     indice = indice +1
                     if indice>=len(opcoes):
                         indice = 0
                 if event.key == pygame.K_w:
+                    menu_selection.play()
                     indice = indice - 1
                     if indice <0:
                         indice = len(opcoes)-1
@@ -132,15 +150,21 @@ def tchau():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE and indice == 1:
+                    cursor_back.play()
                     menu()
                 if event.key == pygame.K_SPACE and indice == 0:
+                    cursor_select.play()
+                    time.sleep(1)
                     pygame.quit()
                     sys.exit()
+
                 if event.key == pygame.K_s:
+                    menu_selection.play()
                     indice = indice +1
                     if indice>=len(opcoes):
                         indice = 0
                 if event.key == pygame.K_w:
+                    menu_selection.play()
                     indice = indice - 1
                     if indice <0:
                         indice = len(opcoes)-1
@@ -176,9 +200,10 @@ def tchau():
 
 
 
-
 def fase1():
+    bloco = Bloco(60,100, id=1)
     bloco.colisao = False
+    x_textos = largura_janela-300
     while True:
         janela.fill((255,255,255))
 
@@ -241,9 +266,9 @@ def fase1():
         tamanho_texto = fonte.render(f"Tamanho:{bloco.tamanho} ",True,(0,0,0))
         id_texto = fonte.render(f"Id:{bloco.id} ",True,(0,0,0))
 
-        janela.blit(colisao_texto,(largura_janela-200,60))
-        janela.blit(tamanho_texto,(largura_janela-200,100))
-        janela.blit(id_texto,(largura_janela-200,140))
+        janela.blit(colisao_texto,(x_textos,60))
+        janela.blit(tamanho_texto,(x_textos,100))
+        janela.blit(id_texto,(x_textos,140))
 
         pygame.display.update()
 
@@ -252,13 +277,17 @@ def fase1():
 
 
 def fase2():
-    bloco = Bloco(x,y, id=1)
-    bloco.colisao = False
+    bloco = Bloco(50,200, id=1)
+    bloco.colisao = True
     while True:
         janela.fill((255,255,255))
 
-        desenhar_paredes(paredes_fase1)
+        desenhar_paredes(paredes_fase2)
 
+        t = pygame.Rect(400,80,40,500)
+        f = pygame.draw.rect(janela,(0,0,0),t)
+
+        
         
 
 
@@ -284,6 +313,8 @@ def fase2():
             dy = -velocidade
         if teclas[pygame.K_DOWN]:
             dy = velocidade
+        if teclas[pygame.K_b]:
+            bloco.colisao = False
 
 
         if teclas[pygame.K_a]:
@@ -297,13 +328,23 @@ def fase2():
         
     
 
-        if bloco.colisao == False:
-            bloco.x +=dx
-            bloco.y +=dy
+        if bloco.colisao == True:
+          
+            
+            if bloco.place().colliderect(f):
+                print("Oi")
+            else:
+                bloco.x +=dx
+                bloco.y +=dy
+
+
 
             if bloco.place().colliderect(q.place()):
                 pass
         else:
+            pass
+
+
             if not bloco.place().colliderect(q.place()):
                 bloco.x +=dx
                 bloco.y +=dy
