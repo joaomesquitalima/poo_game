@@ -51,9 +51,14 @@ def desenhar_paredes(paredes):
             pygame.draw.rect(janela, (0,0,0), parede)
 
 
+
+
+
+
+
 def menu():
 
-    opcoes = [0,1]
+    opcoes = [0,1,2]
     indice = 0
     azul = (0,0,255)
     preto = (0,0,0)
@@ -68,6 +73,8 @@ def menu():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE and indice == 0:
                     fase1()
+                if event.key == pygame.K_SPACE and indice == 2:
+                    tchau()
                 if event.key == pygame.K_s:
                     indice = indice +1
                     if indice>=len(opcoes):
@@ -79,6 +86,7 @@ def menu():
 
         start = fonte.render("Start",True,preto)
         config = fonte.render("configuraçoes",True,preto)
+        sair = fonte.render("Sair",True,preto)
 
         nome = fonte_nome.render("Game OOP",True,preto)
         nome_rect = nome.get_rect(center=(largura_janela/2,altura_janela/2 - 200))
@@ -89,17 +97,84 @@ def menu():
             start = fonte.render("Start",True,azul)
         if indice == 1:
             config = fonte.render("configuraçoes",True,azul)
+        if indice == 2:
+            sair = fonte.render("Sair",True,azul)
 
 
 
-        config_rect = config.get_rect(center=(largura_janela/2,(altura_janela/2)+40))
+        config_rect = config.get_rect(center= (largura_janela/2,(altura_janela/2)+40) )
         start_rect = start.get_rect(center=(largura_janela/2,altura_janela/2))
+        
+        sair_rect = sair.get_rect(center= (largura_janela/2,(altura_janela/2)+80))
         janela.blit(start,start_rect)
         janela.blit(config,config_rect)
+        janela.blit(sair,sair_rect)
 
         
 
         pygame.display.update()
+
+
+
+def tchau():
+    
+    opcoes = [0,1]
+    indice = 0
+    azul = (0,0,255)
+    preto = (0,0,0)
+    while True:
+        janela.fill((255,255,255))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE and indice == 1:
+                    menu()
+                if event.key == pygame.K_SPACE and indice == 0:
+                    pygame.quit()
+                    sys.exit()
+                if event.key == pygame.K_s:
+                    indice = indice +1
+                    if indice>=len(opcoes):
+                        indice = 0
+                if event.key == pygame.K_w:
+                    indice = indice - 1
+                    if indice <0:
+                        indice = len(opcoes)-1
+
+        sim = fonte.render("Sim",True,preto)
+        nao = fonte.render("Não",True,preto)
+        
+
+        nome = fonte_nome.render("Tem certeza que quer sair?",True,preto)
+        nome_rect = nome.get_rect(center=(largura_janela/2,altura_janela/2 - 200))
+        janela.blit(nome,nome_rect)
+
+                    
+        if indice == 0:
+            sim = fonte.render("Sim",True,azul)
+        if indice == 1:
+            nao = fonte.render("Não",True,azul)
+        
+
+
+
+        sim_rect = sim.get_rect(center= (largura_janela/2,(altura_janela/2)+40) )
+        nao_rect = nao.get_rect(center=(largura_janela/2,altura_janela/2))
+        
+      
+        janela.blit(sim,sim_rect)
+        janela.blit(nao,nao_rect)
+        
+
+        
+
+        pygame.display.update()
+
+
 
 
 def fase1():
@@ -233,7 +308,7 @@ def fase2():
                 bloco.x +=dx
                 bloco.y +=dy
             else:
-                break
+                menu()
                 
 
 
