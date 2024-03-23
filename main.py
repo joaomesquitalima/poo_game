@@ -4,6 +4,8 @@ pygame.init()
 
 largura_janela, altura_janela = 1280,720
 janela = pygame.display.set_mode((largura_janela,altura_janela))
+fonte = pygame.font.Font(None, 36) 
+
 
 
 class Bloco():
@@ -54,33 +56,28 @@ while True:
     if teclas[pygame.K_DOWN]:
         dy = velocidade
 
+
+    if teclas[pygame.K_a]:
+        bloco.colisao = True
+
     q = Bloco(500,10,cor="green")
-    if q.place().colliderect(bloco.place()):
-        bloco.x -=2
+    q.place()
+    bloco.x +=dx
+    bloco.y +=dy
+
+
+    if bloco.colisao == False:
+        pass
     else:
-        bloco.x +=dx
+        if q.place().colliderect(bloco.place()):
+            dy = 0
+        else:
+            bloco.x +=dx
 
+    colisao_texto = fonte.render(f"Colisao:{bloco.colisao} ",True,(0,0,0))
+    tamanho_texto = fonte.render(f"Tamanho:{bloco.tamanho} ",True,(0,0,0))
 
-
-
-    
-
-
-
-
-    # # Verificar teclas pressionadas
-    # teclas = pygame.key.get_pressed()
-    # if teclas[pygame.K_LEFT]:
-    #     x_personagem -= velocidade
-    # if teclas[pygame.K_RIGHT]:
-    #     x_personagem += velocidade
-    # if teclas[pygame.K_UP]:
-    #     y_personagem -= velocidade
-    # if teclas[pygame.K_DOWN]:
-    #     y_personagem += velocidade
-
-
-    
-
+    janela.blit(colisao_texto,(largura_janela-200,60))
+    janela.blit(tamanho_texto,(largura_janela-200,100))
 
     pygame.display.update()
