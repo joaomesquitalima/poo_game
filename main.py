@@ -2,6 +2,24 @@ import pygame,sys
 import time
 pygame.init()
 
+
+
+# Inicialize os dispositivos de joystick
+pygame.joystick.init()
+
+# Verifique se há pelo menos um joystick conectado
+if pygame.joystick.get_count() == 0:
+    print("Nenhum joystick encontrado. Certifique-se de que um controle de PS4 está conectado.")
+    pass
+
+# Configure o primeiro joystick (controle de PS4)
+controle_ps4 = pygame.joystick.Joystick(0)
+controle_ps4.init()
+
+
+
+
+
 largura_janela, altura_janela = 1280,720
 janela = pygame.display.set_mode((largura_janela,altura_janela))
 fonte = pygame.font.Font(None, 50) 
@@ -103,6 +121,23 @@ def menu():
     preto = (0,0,0)
     while True:
         janela.fill((255,255,255))
+
+        botao_x = controle_ps4.get_button(0)  # Verifica se o botão X (índice 2) está pressionado
+        eixo_direcional_x = controle_ps4.get_axis(0)  # Eixo esquerdo horizontal
+        eixo_direcional_y = controle_ps4.get_axis(1)  # Eixo esquerdo vertical
+        up = controle_ps4.get_button(11)
+        print(up)
+
+        if botao_x and indice == 0:
+            fase1()
+
+        if up:
+            menu_selection.play()
+            indice-=1
+            if indice <0:
+                indice = len(opcoes)-1
+            
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
