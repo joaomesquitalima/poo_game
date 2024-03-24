@@ -10,6 +10,7 @@ fonte_nome = pygame.font.Font(None,100)
 menu_selection = pygame.mixer.Sound('menu_selection.wav')
 cursor_select = pygame.mixer.Sound("cursor_select.wav")
 cursor_back = pygame.mixer.Sound("cursor_back.wav")
+mudar = pygame.mixer.Sound("open_001.ogg")
 
 coletou = pygame.mixer.Sound("coletado.ogg")
 
@@ -283,6 +284,7 @@ def fase1():
 
 def fase2():
     bloco = Bloco(50,200, id=1)
+    
     bloco.colisao = True
     qt_coletados =0
 
@@ -314,6 +316,7 @@ def fase2():
                 pygame.quit()
                 sys.exit()
 
+        
         
         
         bloco.place()
@@ -353,6 +356,10 @@ def fase2():
                 coletou.play()
                 itens.pop()
                 qt_coletados+=1
+
+        
+        if qt_coletados == 2:
+            fase3()
             
 
 
@@ -372,6 +379,115 @@ def fase2():
         pygame.display.update()
 
     
+def fase3():
+    
+    bloco = Bloco(50,200, id=1)
+    bloco.colisao = True
+    qt_coletados =0
+
+    item1 = Bloco(500,200,cor="green")
+    item2 = Bloco(50,400,cor="green")
+    
+
+    itens = [item1,item2]
+
+    bloco2 = Bloco(500,400,id=2,cor=(0,0,0))
+
+    while True:
+        janela.fill((255,255,255))
+
+        desenhar_paredes(paredes_fase2)
+
+        t = pygame.Rect(400,80,40,500)
+        f = pygame.draw.rect(janela,(0,0,0),t)
+
+        for item in itens:
+            item.place()
+
+        
+        
+
+
+        clock.tick(60)
+       
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        
+        
+        bloco.place()
+        bloco2.place()
+
+        # Movimento do quadrado principal
+
+        
+        teclas = pygame.key.get_pressed()
+        dx, dy = 0, 0
+        if teclas[pygame.K_LEFT] or teclas[pygame.K_a]:
+            dx = -velocidade
+        if teclas[pygame.K_RIGHT] or teclas[pygame.K_d]:
+            dx = velocidade
+        if teclas[pygame.K_UP] or teclas[pygame.K_w]:
+            dy = -velocidade
+        if teclas[pygame.K_DOWN] or teclas[pygame.K_s]:
+            dy = velocidade
+
+        if teclas[pygame.K_m]:
+            bloco.id =2
+            bloco.cor = (0,0,0)
+            bloco2.cor = (0,0,255)
+            mudar.play()
+        
+
+        
+        if bloco.id == 1:
+            bloco.dx = dx
+            bloco.dy = dy
+        else:
+            bloco2.dx = dx
+            bloco2.dy = dy
+        
+    
+
+        if bloco.colisao == True:
+          
+            
+            if bloco.place().colliderect(f):
+                print("Oi")
+            else:
+                if bloco.id ==1:
+                    bloco.x +=dx
+                    bloco.y +=dy
+                else:
+                    bloco2.x +=dx
+                    bloco2.y +=dy
+
+
+        for item in range(len(itens)):
+            if bloco.place().colliderect(itens[item].place()):
+                coletou.play()
+                itens.pop()
+                qt_coletados+=1
+            
+
+
+   
+
+
+        colisao_texto = fonte.render(f"Colisao:{bloco.colisao} ",True,(0,0,0))
+        tamanho_texto = fonte.render(f"Tamanho:{bloco.tamanho} ",True,(0,0,0))
+        id_texto = fonte.render(f"Id:{bloco.id} ",True,(0,0,0))
+        coletados = fonte.render(f"coletados:{qt_coletados}/{2}",True,(0,0,0))
+
+        janela.blit(colisao_texto,(largura_janela-200,60))
+        janela.blit(tamanho_texto,(largura_janela-200,100))
+        janela.blit(id_texto,(largura_janela-200,140))
+        janela.blit(coletados,(largura_janela-200,180))
+
+        pygame.display.update()
+
 
 
 menu()
