@@ -11,6 +11,7 @@ menu_selection = pygame.mixer.Sound('menu_selection.wav')
 cursor_select = pygame.mixer.Sound("cursor_select.wav")
 cursor_back = pygame.mixer.Sound("cursor_back.wav")
 
+coletou = pygame.mixer.Sound("coletado.ogg")
 
 
 class Bloco():
@@ -204,6 +205,7 @@ def fase1():
     bloco = Bloco(60,100, id=1)
     bloco.colisao = False
     x_textos = largura_janela-300
+    qt_coletados = 0
     while True:
         janela.fill((255,255,255))
 
@@ -226,17 +228,17 @@ def fase1():
         # Movimento do quadrado principal
         teclas = pygame.key.get_pressed()
         dx, dy = 0, 0
-        if teclas[pygame.K_LEFT]:
+        if teclas[pygame.K_LEFT] or teclas[pygame.K_a]:
             dx = -velocidade
-        if teclas[pygame.K_RIGHT]:
+        if teclas[pygame.K_RIGHT] or teclas[pygame.K_d]:
             dx = velocidade
-        if teclas[pygame.K_UP]:
+        if teclas[pygame.K_UP] or teclas[pygame.K_w]:
             dy = -velocidade
-        if teclas[pygame.K_DOWN]:
+        if teclas[pygame.K_DOWN] or teclas[pygame.K_s]:
             dy = velocidade
 
 
-        if teclas[pygame.K_a]:
+        if teclas[pygame.K_t]:
             bloco.colisao = True
 
         q = Bloco(500,200,cor="green")
@@ -258,17 +260,20 @@ def fase1():
                 bloco.x +=dx
                 bloco.y +=dy
             else:
+                qt_coletados+=1
                 fase2()
                 
 
 
         colisao_texto = fonte.render(f"Colisao:{bloco.colisao} ",True,(0,0,0))
         tamanho_texto = fonte.render(f"Tamanho:{bloco.tamanho} ",True,(0,0,0))
+        coletados = fonte.render(f"coletados:{qt_coletados}/{1}",True,(0,0,0))
         id_texto = fonte.render(f"Id:{bloco.id} ",True,(0,0,0))
 
         janela.blit(colisao_texto,(x_textos,60))
         janela.blit(tamanho_texto,(x_textos,100))
         janela.blit(id_texto,(x_textos,140))
+        janela.blit(coletados,(x_textos,180))
 
         pygame.display.update()
 
@@ -279,6 +284,14 @@ def fase1():
 def fase2():
     bloco = Bloco(50,200, id=1)
     bloco.colisao = True
+    qt_coletados =0
+
+    item1 = Bloco(500,200,cor="green")
+    item2 = Bloco(50,400,cor="green")
+    
+
+    itens = [item1,item2]
+
     while True:
         janela.fill((255,255,255))
 
@@ -286,6 +299,9 @@ def fase2():
 
         t = pygame.Rect(400,80,40,500)
         f = pygame.draw.rect(janela,(0,0,0),t)
+
+        for item in itens:
+            item.place()
 
         
         
@@ -305,23 +321,17 @@ def fase2():
         # Movimento do quadrado principal
         teclas = pygame.key.get_pressed()
         dx, dy = 0, 0
-        if teclas[pygame.K_LEFT]:
+        if teclas[pygame.K_LEFT] or teclas[pygame.K_a]:
             dx = -velocidade
-        if teclas[pygame.K_RIGHT]:
+        if teclas[pygame.K_RIGHT] or teclas[pygame.K_d]:
             dx = velocidade
-        if teclas[pygame.K_UP]:
+        if teclas[pygame.K_UP] or teclas[pygame.K_w]:
             dy = -velocidade
-        if teclas[pygame.K_DOWN]:
+        if teclas[pygame.K_DOWN] or teclas[pygame.K_s]:
             dy = velocidade
-        if teclas[pygame.K_b]:
-            bloco.colisao = False
+        
 
-
-        if teclas[pygame.K_a]:
-            bloco.colisao = True
-
-        q = Bloco(500,200,cor="green")
-        q.place()
+        
 
         bloco.dx = dx
         bloco.dy = dy
@@ -338,28 +348,26 @@ def fase2():
                 bloco.y +=dy
 
 
+        for item in range(len(itens)):
+            if bloco.place().colliderect(itens[item].place()):
+                coletou.play()
+                itens.pop()
+                qt_coletados+=1
+            
 
-            if bloco.place().colliderect(q.place()):
-                pass
-        else:
-            pass
 
-
-            if not bloco.place().colliderect(q.place()):
-                bloco.x +=dx
-                bloco.y +=dy
-            else:
-                menu()
-                
+   
 
 
         colisao_texto = fonte.render(f"Colisao:{bloco.colisao} ",True,(0,0,0))
         tamanho_texto = fonte.render(f"Tamanho:{bloco.tamanho} ",True,(0,0,0))
         id_texto = fonte.render(f"Id:{bloco.id} ",True,(0,0,0))
+        coletados = fonte.render(f"coletados:{qt_coletados}/{2}",True,(0,0,0))
 
         janela.blit(colisao_texto,(largura_janela-200,60))
         janela.blit(tamanho_texto,(largura_janela-200,100))
         janela.blit(id_texto,(largura_janela-200,140))
+        janela.blit(coletados,(largura_janela-200,180))
 
         pygame.display.update()
 
