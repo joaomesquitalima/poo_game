@@ -10,11 +10,11 @@ pygame.joystick.init()
 # Verifique se há pelo menos um joystick conectado
 if pygame.joystick.get_count() == 0:
     print("Nenhum joystick encontrado. Certifique-se de que um controle de PS4 está conectado.")
-    pass
+else:
 
-# Configure o primeiro joystick (controle de PS4)
-controle_ps4 = pygame.joystick.Joystick(0)
-controle_ps4.init()
+    # Configure o primeiro joystick (controle de PS4)
+    controle_ps4 = pygame.joystick.Joystick(0)
+    controle_ps4.init()
 
 
 
@@ -22,22 +22,31 @@ controle_ps4.init()
 
 largura_janela, altura_janela = 1280,720
 janela = pygame.display.set_mode((largura_janela,altura_janela))
-fonte = pygame.font.Font(None, 50) 
-fonte_nome = pygame.font.Font(None,100)
+fonte = pygame.font.Font("ThaleahFat.ttf", 50) 
+fonte_nome = pygame.font.Font("ThaleahFat.ttf",100)
 
-menu_selection = pygame.mixer.Sound('menu_selection.wav')
-cursor_select = pygame.mixer.Sound("cursor_select.wav")
-cursor_back = pygame.mixer.Sound("cursor_back.wav")
-mudar = pygame.mixer.Sound("open_001.ogg")
-coletou = pygame.mixer.Sound("coletado.ogg")
-click = pygame.mixer.Sound("click.2.ogg")
+fonte_outros = pygame.font.Font("ThaleahFat.ttf",45)
+
+fundo = pygame.image.load("tela_pico8_preta.png")
+fundo = pygame.transform.scale(fundo, (largura_janela, altura_janela))
 
 
+menu_selection = pygame.mixer.Sound('audios/menu_selection.wav')
+cursor_select = pygame.mixer.Sound("audios/cursor_select.wav")
+cursor_back = pygame.mixer.Sound("audios/cursor_back.wav")
+mudar = pygame.mixer.Sound("audios/open_001.ogg")
+coletou = pygame.mixer.Sound("audios/coletado.ogg")
+click = pygame.mixer.Sound("audios/click.2.ogg")
 
-botao_up = pygame.image.load("botao_up.png").convert_alpha()
+player = pygame.image.load("imagens/robo1.png").convert_alpha()
+
+
+
+
+botao_up = pygame.image.load("imagens/botao_up.png").convert_alpha()
 botao_up_rect = botao_up.get_rect(center=(200,400))
 
-botao_down = pygame.image.load("botao_down.png").convert_alpha()
+botao_down = pygame.image.load("imagens/botao_down.png").convert_alpha()
 botao_down_rect = botao_up.get_rect(center=(200,400))
 
 
@@ -105,7 +114,7 @@ paredes_fase3 = [
 def desenhar_paredes(paredes):
         
         for parede in paredes:
-            pygame.draw.rect(janela, (0,0,0), parede)
+            pygame.draw.rect(janela, (255,255,255), parede)
 
 
 
@@ -114,28 +123,42 @@ def desenhar_paredes(paredes):
 
 
 def menu():
+        # Carregue a música
+    pygame.mixer.music.load('musica/menu.mp3')
+
+    # Defina o volume (opcional)
+    pygame.mixer.music.set_volume(0.5)  # Valor varia de 0.0 a 1.0
+
+    # Reproduza a música em loop infinito (-1 significa loop infinito)
+    pygame.mixer.music.play(-1)
+
 
     opcoes = [0,1,2]
     indice = 0
     azul = (0,0,255)
-    preto = (0,0,0)
+    preto = (255,255,255)
     while True:
         janela.fill((255,255,255))
+        janela.blit(fundo,(0,0))
 
-        botao_x = controle_ps4.get_button(0)  # Verifica se o botão X (índice 2) está pressionado
-        eixo_direcional_x = controle_ps4.get_axis(0)  # Eixo esquerdo horizontal
-        eixo_direcional_y = controle_ps4.get_axis(1)  # Eixo esquerdo vertical
-        up = controle_ps4.get_button(11)
-        print(up)
+        if pygame.joystick.get_count() == 0:
+            pass
+        else:
 
-        if botao_x and indice == 0:
-            fase1()
+            botao_x = controle_ps4.get_button(0)  # Verifica se o botão X (índice 2) está pressionado
+            eixo_direcional_x = controle_ps4.get_axis(0)  # Eixo esquerdo horizontal
+            eixo_direcional_y = controle_ps4.get_axis(1)  # Eixo esquerdo vertical
+            up = controle_ps4.get_button(11)
+            # print(up)
 
-        if up:
-            menu_selection.play()
-            indice-=1
-            if indice <0:
-                indice = len(opcoes)-1
+            if botao_x and indice == 0:
+                fase1()
+
+            if up:
+                menu_selection.play()
+                indice-=1
+                if indice <0:
+                    indice = len(opcoes)-1
             
 
 
@@ -162,7 +185,7 @@ def menu():
                         indice = len(opcoes)-1
 
         start = fonte.render("Start",True,preto)
-        config = fonte.render("configuraçoes",True,preto)
+        config = fonte.render("conquistas",True,preto)
         sair = fonte.render("Sair",True,preto)
 
         nome = fonte_nome.render("Game OOP",True,preto)
@@ -173,7 +196,7 @@ def menu():
         if indice == 0:
             start = fonte.render("Start",True,azul)
         if indice == 1:
-            config = fonte.render("configuraçoes",True,azul)
+            config = fonte.render("conquistas",True,azul)
         if indice == 2:
             sair = fonte.render("Sair",True,azul)
 
@@ -198,9 +221,10 @@ def tchau():
     opcoes = [0,1]
     indice = 0
     azul = (0,0,255)
-    preto = (0,0,0)
+    preto = (255,255,255)
     while True:
         janela.fill((255,255,255))
+        janela.blit(fundo,(0,0))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -229,18 +253,18 @@ def tchau():
                         indice = len(opcoes)-1
 
         sim = fonte.render("Sim",True,preto)
-        nao = fonte.render("Não",True,preto)
+        nao = fonte.render("Nao",True,preto)
         
 
-        nome = fonte_nome.render("Tem certeza que quer sair?",True,preto)
-        nome_rect = nome.get_rect(center=(largura_janela/2,altura_janela/2 - 200))
+        nome = fonte_outros.render("Tem certeza que quer sair?",True,preto)
+        nome_rect = nome.get_rect(center=(largura_janela/2,altura_janela/2 - 100))
         janela.blit(nome,nome_rect)
 
                     
         if indice == 0:
             sim = fonte.render("Sim",True,azul)
         if indice == 1:
-            nao = fonte.render("Não",True,azul)
+            nao = fonte.render("Nao",True,azul)
         
 
 
@@ -262,6 +286,7 @@ def pause(fase):
     indice = 0
     azul = (0,0,255)
     preto = (0,0,0)
+    
     while True:
         janela.fill((255,255,255))
 
@@ -334,8 +359,10 @@ def fase1():
     bloco.colisao = False
     x_textos = largura_janela-300
     qt_coletados = 0
+    player_rect = player.get_rect(center = (50,50))
     while True:
         janela.fill((255,255,255))
+        janela.blit(fundo,(0,0))
 
         desenhar_paredes(paredes_fase1)
 
@@ -376,8 +403,12 @@ def fase1():
         q = Bloco(500,200,cor="green")
         q.place()
 
-        bloco.dx = dx
-        bloco.dy = dy
+        # bloco.dx = dx
+        # bloco.dy = dy
+
+        
+        
+
         
         
 
@@ -386,8 +417,11 @@ def fase1():
             if colidiu(bloco,paredes_fase1):
                 pass
             else:
-                bloco.x +=dx
-                bloco.y +=dy
+                # bloco.x +=dx
+                # bloco.y +=dy
+
+                player_rect.x +=dx
+                player_rect.y +=dy
 
             if bloco.place().colliderect(q.place()):
                 pass
@@ -412,6 +446,8 @@ def fase1():
         janela.blit(tamanho_texto,(x_textos,100))
         janela.blit(id_texto,(x_textos,140))
         janela.blit(coletados,(x_textos,180))
+
+        janela.blit(player,player_rect)
 
         pygame.display.update()
 
