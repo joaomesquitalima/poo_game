@@ -17,10 +17,14 @@ else:
     controle_ps4.init()
 
 
+parede_esquerda = 357
+parede_direita = 860
+
 
 largura_janela, altura_janela = 1280,720
 janela = pygame.display.set_mode((largura_janela,altura_janela))
-fonte = pygame.font.Font("ThaleahFat.ttf", 50) 
+fonte = pygame.font.Font("ThaleahFat.ttf", 50) #fonte media
+fonte_pequena = pygame.font.Font("ThaleahFat.ttf",40)
 fonte_nome = pygame.font.Font("ThaleahFat.ttf",100)
 
 fonte_outros = pygame.font.Font("ThaleahFat.ttf",45)
@@ -40,15 +44,9 @@ player = pygame.image.load("ship_teste.png").convert_alpha()
 
 player = pygame.transform.scale(player,(64,64))
 
-
-
-
-botao_up = pygame.image.load("imagens/botao_up.png").convert_alpha()
-botao_up_rect = botao_up.get_rect(center=(200,400))
-
-botao_down = pygame.image.load("imagens/botao_down.png").convert_alpha()
-botao_down_rect = botao_up.get_rect(center=(200,400))
-
+enemy = pygame.image.load("alien1.png").convert_alpha()
+enemy = pygame.transform.scale(enemy,(64,64))
+enemy_rect = enemy.get_rect(center = (413,151))
 
 
 
@@ -57,24 +55,30 @@ clock = pygame.time.Clock()
 
 
 
-
-
 velocidade = 5
 
+class Inimigo():
+    def __init__(self,img,x,y,life,velocidade):
+        self.x = x
+        self.y = y
+        self.life = life
+        self.velocidade = velocidade
+        self.img = pygame.image.load(img).convert_alpha()
+        self.img = pygame.transform.scale(self.img,(64,64))
+        self.img_rect = self.img.get_rect(center=(x,y))
+    def atack(self):
+        pass
+    
 
+    
 
-def desenhar_paredes(paredes):
         
-        for parede in paredes:
-            pygame.draw.rect(janela, (255,255,255,0), parede)
-
-
-
 
 class Player():
     def __init__(self,x,y):
         self.x = x
         self.y = y
+        
         self.player_rect = player.get_rect(center = (self.x,self.y))
 
 
@@ -312,6 +316,11 @@ def fase1():
 
 
     jogador = Player(632,591)
+    enemy = Inimigo("alien1.png",390,200,10,5)
+    enemy_img = enemy.img
+    enemy_rect = enemy.img_rect
+    vel_inimigo = enemy.velocidade
+    pontos = 0
     while True:
         janela.fill((255,255,255))
         janela.blit(fundo,(0,0))
@@ -326,32 +335,39 @@ def fase1():
                 pygame.quit()
                 sys.exit()
 
-        
-     
-        # Movimento do quadrado principal
+      
+        # Movimento da nave principal
         teclas = pygame.key.get_pressed()
         dx, dy = 0, 0
-        if teclas[pygame.K_LEFT] or teclas[pygame.K_a]:
+        if teclas[pygame.K_LEFT] or teclas[pygame.K_a] and jogador_rect.x > parede_esquerda:
             dx = -velocidade
-        if teclas[pygame.K_RIGHT] or teclas[pygame.K_d]:
+        if teclas[pygame.K_RIGHT] or teclas[pygame.K_d] and jogador_rect.x < parede_direita:
             dx = velocidade
-        if teclas[pygame.K_UP] or teclas[pygame.K_w]:
-            dy = -velocidade
-        if teclas[pygame.K_DOWN] or teclas[pygame.K_s]:
-            dy = velocidade
-        if teclas[pygame.K_b]:
-            pause(fase1)
+        
+        jogador_rect.x+=dx
 
 
-       
+        #movimento alien
+        
+        if enemy_rect.x < parede_esquerda:
+            vel_inimigo = 5
+            # pass
+        if enemy_rect.x > parede_direita:
+            vel_inimigo = -5
 
-        jogador_rect.x +=dx
-        jogador_rect.y += dy
+        enemy_rect.x += vel_inimigo
+
+        score = fonte_pequena.render(f"Score:{pontos}",True,(255,255,255))
+        vidas = fonte_pequena.render("Life:",True,(255,255,255))
+
+        
 
       
   
-
         janela.blit(player,jogador_rect)
+        janela.blit(enemy_img,enemy_rect)
+        janela.blit(score,(parede_esquerda +4,90))
+        janela.blit(vidas,(parede_esquerda +4,127))
 
         pygame.display.update()
 
