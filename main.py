@@ -70,8 +70,29 @@ class Inimigo():
         self.img = pygame.image.load(img).convert_alpha()
         self.img = pygame.transform.scale(self.img,(64,64))
         self.img_rect = self.img.get_rect(center=(x,y))
+        self.vel_inimigo = self.velocidade
     def atack(self):
         pass
+
+    def move(self):
+        #movimento alien
+        
+        
+        if self.img_rect.x < parede_esquerda:
+            self.vel_inimigo = self.velocidade
+            self.img_rect.y +=10
+            
+            # pass
+        if self.img_rect.x > parede_direita:
+            self.vel_inimigo = -self.velocidade
+            self.img_rect.y +=10
+
+        self.img_rect.x += self.vel_inimigo
+
+        janela.blit(self.img,self.img_rect)
+
+        
+            
     
 
     
@@ -85,7 +106,9 @@ class Player():
         
         self.player_rect = player.get_rect(center = (self.x,self.y))
     def atacar(self):
-        pass
+        laser_rect = laser.get_rect(center=(self.x,self.y))
+        
+        janela.blit(laser,laser_rect)
 
 
 def menu():
@@ -258,10 +281,11 @@ def fase1():
 
 
     jogador = Player(632,591)
-    enemy = Inimigo("alien1.png",390,200,1,3)
-    enemy_img = enemy.img
-    enemy_rect = enemy.img_rect
-    vel_inimigo = enemy.velocidade
+    enemy = Inimigo("alien1.png",490,200,1,3)
+    enemy2 = Inimigo("alien1.png",600,250,1,3)
+    enemy3 = Inimigo("alien1.png",390,300,1,3)
+    
+    
     pontos = 0
     while True:
         janela.fill((255,255,255))
@@ -277,6 +301,10 @@ def fase1():
                 pygame.quit()
                 sys.exit()
 
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    jogador.atacar()
+
       
         # Movimento da nave principal
         teclas = pygame.key.get_pressed()
@@ -289,16 +317,11 @@ def fase1():
         jogador_rect.x+=dx
 
 
-        #movimento alien
-        if enemy_rect.x < parede_esquerda:
-            vel_inimigo = enemy.velocidade
-            enemy_rect.y +=10
-            # pass
-        if enemy_rect.x > parede_direita:
-            vel_inimigo = -enemy.velocidade
-            enemy_rect.y +=10
+        
 
-        enemy_rect.x += vel_inimigo
+        enemy.move()
+        enemy2.move()
+        enemy3.move()
 
         score = fonte_pequena.render(f"Score: {pontos}",True,(255,255,255))
         vidas = fonte_pequena.render("Life:",True,(255,255,255))
@@ -308,7 +331,7 @@ def fase1():
       
   
         janela.blit(player,jogador_rect)
-        janela.blit(enemy_img,enemy_rect)
+        
         janela.blit(score,(parede_esquerda +4,90))
         janela.blit(vidas,(parede_esquerda +4,127))
 
