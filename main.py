@@ -40,6 +40,8 @@ click = pygame.mixer.Sound("audios/click.2.ogg")
 
 player = pygame.image.load("imagens/robo1.png").convert_alpha()
 
+player = pygame.transform.scale(player,(64,64))
+
 
 
 
@@ -76,11 +78,11 @@ clock = pygame.time.Clock()
 velocidade = 10
 
 paredes_fase1 = [
-    pygame.Rect(10, 40, 20, 600),
-    pygame.Rect(10, 40, 800, 20),
+    pygame.Rect(335, 89, 20, 550), # parede vertical esquerda
+    pygame.Rect(335, 72, 610, 20), # parede superior
 
-    pygame.Rect(0, 615, 800, 20),
-    pygame.Rect(780, 40, 20, 600),
+    pygame.Rect(335, 615, 610, 20),
+    pygame.Rect(924, 80, 20, 550), #parede vertical direita
 
 
 ]
@@ -114,17 +116,23 @@ paredes_fase3 = [
 def desenhar_paredes(paredes):
         
         for parede in paredes:
-            pygame.draw.rect(janela, (255,255,255), parede)
+            pygame.draw.rect(janela, (255,255,255,0), parede)
 
 
 
 
-
+class Player():
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y
+        self.player_rect = player.get_rect(center = (self.x,self.y))
 
 
 def menu():
         # Carregue a música
     pygame.mixer.music.load('musica/menu.mp3')
+
+    
 
     # Defina o volume (opcional)
     pygame.mixer.music.set_volume(0.5)  # Valor varia de 0.0 a 1.0
@@ -138,6 +146,9 @@ def menu():
     azul = (0,0,255)
     preto = (255,255,255)
     while True:
+        # Obtenha a posição do mouse
+        posicao_mouse = pygame.mouse.get_pos()
+        print(posicao_mouse)
         janela.fill((255,255,255))
         janela.blit(fundo,(0,0))
 
@@ -145,11 +156,10 @@ def menu():
             pass
         else:
 
-            botao_x = controle_ps4.get_button(0)  # Verifica se o botão X (índice 2) está pressionado
-            eixo_direcional_x = controle_ps4.get_axis(0)  # Eixo esquerdo horizontal
-            eixo_direcional_y = controle_ps4.get_axis(1)  # Eixo esquerdo vertical
+            botao_x = controle_ps4.get_button(0) 
+            
             up = controle_ps4.get_button(11)
-            # print(up)
+        
 
             if botao_x and indice == 0:
                 fase1()
@@ -347,11 +357,10 @@ def pause(fase):
 
 
 
-def colidiu(bloco,paredes):
-    for i in paredes:
-        if bloco.place().colliderect(i):
-            return True
-    return False
+# def colidiu(imagem_rect,paredes,dx,dy):
+#     for parede in paredes:
+        
+
     
 
 def fase1():
@@ -359,13 +368,26 @@ def fase1():
     bloco.colisao = False
     x_textos = largura_janela-300
     qt_coletados = 0
-    player_rect = player.get_rect(center = (50,50))
+
+    q = Bloco(500,200,cor="green")
+    
+
+    itens = [q]
+
+
+    
+    
+
+    jogador = Player(457,521)
     while True:
         janela.fill((255,255,255))
         janela.blit(fundo,(0,0))
 
+        jogador_rect = jogador.player_rect
+
         desenhar_paredes(paredes_fase1)
 
+       
         
         clock.tick(60)
        
@@ -375,8 +397,9 @@ def fase1():
                 sys.exit()
 
         
-        
-        bloco.place()
+        for item in itens:
+            q.place()
+   
 
         # Movimento do quadrado principal
         teclas = pygame.key.get_pressed()
@@ -393,61 +416,34 @@ def fase1():
             pause(fase1)
 
 
-        if bloco.place().colliderect(botao_up_rect) and bloco.colisao == False:
+        if jogador_rect.colliderect(botao_up_rect) and bloco.colisao == False:
             bloco.colisao = True
             click.play()
             
         
 
 
-        q = Bloco(500,200,cor="green")
-        q.place()
+     
 
-        # bloco.dx = dx
-        # bloco.dy = dy
+        jogador_rect.x +=dx
+        jogador_rect.y += dy
 
-        
-        
+        # colidiu(jogador_rect,paredes_fase1,dx,dy)
 
-        
-        
-
-        if bloco.colisao == False:
-            janela.blit(botao_up,botao_up_rect)
-            if colidiu(bloco,paredes_fase1):
-                pass
-            else:
-                # bloco.x +=dx
-                # bloco.y +=dy
-
-                player_rect.x +=dx
-                player_rect.y +=dy
-
-            if bloco.place().colliderect(q.place()):
-                pass
-        else:
-            janela.blit(botao_down,botao_down_rect)
-            if colidiu(bloco,paredes_fase1):
-                pass
-            else:
-                bloco.x +=dx
-                bloco.y +=dy
-
-            if bloco.place().colliderect(q.place()):
+        for item in range(len(itens)):
+            if jogador_rect.colliderect(itens[item].place()):
+                coletou.play()
+                itens.pop()
                 qt_coletados+=1
-                fase2()
+
+
+  
+        
+
               
-        colisao_texto = fonte.render(f"Colisao:{bloco.colisao} ",True,(0,0,0))
-        tamanho_texto = fonte.render(f"Tamanho:{bloco.tamanho} ",True,(0,0,0))
-        coletados = fonte.render(f"coletados:{qt_coletados}/{1}",True,(0,0,0))
-        id_texto = fonte.render(f"Id:{bloco.id} ",True,(0,0,0))
+    
 
-        janela.blit(colisao_texto,(x_textos,60))
-        janela.blit(tamanho_texto,(x_textos,100))
-        janela.blit(id_texto,(x_textos,140))
-        janela.blit(coletados,(x_textos,180))
-
-        janela.blit(player,player_rect)
+        janela.blit(player,jogador_rect)
 
         pygame.display.update()
 
@@ -504,17 +500,12 @@ def fase2():
             click.play()
 
 
-        
 
-        bloco.dx = dx
-        bloco.dy = dy
-        
-    
 
         if bloco.colisao == True:
             janela.blit(botao_up,botao_up_rect)
 
-            if colidiu(bloco,paredes_fase2) or bloco.place().colliderect(f):
+            if colidiu(bloco,paredes_fase2,dx,dy) or bloco.place().colliderect(f):
                 pass
             else:
                 bloco.x +=dx
