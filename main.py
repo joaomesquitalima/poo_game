@@ -11,7 +11,6 @@ pygame.joystick.init()
 if pygame.joystick.get_count() == 0:
     print("Nenhum joystick encontrado. Certifique-se de que um controle de PS4 está conectado.")
 else:
-
     # Configure o primeiro joystick (controle de PS4)
     controle_ps4 = pygame.joystick.Joystick(0)
     controle_ps4.init()
@@ -44,10 +43,15 @@ player = pygame.image.load("ship_teste.png").convert_alpha()
 
 player = pygame.transform.scale(player,(64,64))
 
+vidas = pygame.image.load("ship_teste.png").convert_alpha()
+vidas = pygame.transform.scale(vidas,(32,32))
+
 enemy = pygame.image.load("alien1.png").convert_alpha()
 enemy = pygame.transform.scale(enemy,(64,64))
 enemy_rect = enemy.get_rect(center = (413,151))
 
+laser = pygame.image.load("blasterbolt.png").convert_alpha()
+laser_rect = laser.get_rect()
 
 
 
@@ -80,6 +84,8 @@ class Player():
         self.y = y
         
         self.player_rect = player.get_rect(center = (self.x,self.y))
+    def atacar(self):
+        pass
 
 
 def menu():
@@ -245,70 +251,6 @@ def tchau():
 
         pygame.display.update()
 
-def pause(fase):
-    opcoes = [0,1]
-    indice = 0
-    azul = (0,0,255)
-    preto = (0,0,0)
-    
-    while True:
-        janela.fill((255,255,255))
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE and indice == 1:
-                    cursor_back.play()
-                    fase()
-                if event.key == pygame.K_SPACE and indice == 0:
-                    cursor_select.play()
-                    time.sleep(1)
-                    pygame.quit()
-                    sys.exit()
-
-                if event.key == pygame.K_s:
-                    menu_selection.play()
-                    indice = indice +1
-                    if indice>=len(opcoes):
-                        indice = 0
-                if event.key == pygame.K_w:
-                    menu_selection.play()
-                    indice = indice - 1
-                    if indice <0:
-                        indice = len(opcoes)-1
-
-        sim = fonte.render("Sim",True,preto)
-        nao = fonte.render("Não",True,preto)
-        
-
-        nome = fonte_nome.render("Tem certeza que quer sair?",True,preto)
-        nome_rect = nome.get_rect(center=(largura_janela/2,altura_janela/2 - 200))
-        janela.blit(nome,nome_rect)
-
-                    
-        if indice == 0:
-            sim = fonte.render("Sim",True,azul)
-        if indice == 1:
-            nao = fonte.render("Não",True,azul)
-        
-
-
-
-        sim_rect = sim.get_rect(center= (largura_janela/2,(altura_janela/2)+40) )
-        nao_rect = nao.get_rect(center=(largura_janela/2,altura_janela/2))
-        
-      
-        janela.blit(sim,sim_rect)
-        janela.blit(nao,nao_rect)
-        
-
-        
-
-        pygame.display.update()
-
     
 
 def fase1():
@@ -316,7 +258,7 @@ def fase1():
 
 
     jogador = Player(632,591)
-    enemy = Inimigo("alien1.png",390,200,10,5)
+    enemy = Inimigo("alien1.png",390,200,1,3)
     enemy_img = enemy.img
     enemy_rect = enemy.img_rect
     vel_inimigo = enemy.velocidade
@@ -338,7 +280,7 @@ def fase1():
       
         # Movimento da nave principal
         teclas = pygame.key.get_pressed()
-        dx, dy = 0, 0
+        dx= 0
         if teclas[pygame.K_LEFT] or teclas[pygame.K_a] and jogador_rect.x > parede_esquerda:
             dx = -velocidade
         if teclas[pygame.K_RIGHT] or teclas[pygame.K_d] and jogador_rect.x < parede_direita:
@@ -348,16 +290,17 @@ def fase1():
 
 
         #movimento alien
-        
         if enemy_rect.x < parede_esquerda:
-            vel_inimigo = 5
+            vel_inimigo = enemy.velocidade
+            enemy_rect.y +=10
             # pass
         if enemy_rect.x > parede_direita:
-            vel_inimigo = -5
+            vel_inimigo = -enemy.velocidade
+            enemy_rect.y +=10
 
         enemy_rect.x += vel_inimigo
 
-        score = fonte_pequena.render(f"Score:{pontos}",True,(255,255,255))
+        score = fonte_pequena.render(f"Score: {pontos}",True,(255,255,255))
         vidas = fonte_pequena.render("Life:",True,(255,255,255))
 
         
