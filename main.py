@@ -18,8 +18,6 @@ else:
 
 
 
-
-
 largura_janela, altura_janela = 1280,720
 janela = pygame.display.set_mode((largura_janela,altura_janela))
 fonte = pygame.font.Font("ThaleahFat.ttf", 50) 
@@ -38,7 +36,7 @@ mudar = pygame.mixer.Sound("audios/open_001.ogg")
 coletou = pygame.mixer.Sound("audios/coletado.ogg")
 click = pygame.mixer.Sound("audios/click.2.ogg")
 
-player = pygame.image.load("imagens/robo1.png").convert_alpha()
+player = pygame.image.load("ship_teste.png").convert_alpha()
 
 player = pygame.transform.scale(player,(64,64))
 
@@ -52,20 +50,6 @@ botao_down = pygame.image.load("imagens/botao_down.png").convert_alpha()
 botao_down_rect = botao_up.get_rect(center=(200,400))
 
 
-class Bloco():
-    def __init__(self,x,y,colisao=False,tamanho= 50,cor = "blue",dx=0,dy=0,id=0):
-        self.colisao = colisao
-        self.tamanho = tamanho
-        self.cor = cor
-        self.x = x
-        self.y = y
-        self.dx = dx
-        self.dy = dy
-        self.id = id
-
-    def place(self):
-        
-        return pygame.draw.rect(janela, self.cor, (self.x +self.dx, self.y+self.dy, self.tamanho, self.tamanho))
 
 
 
@@ -75,43 +59,9 @@ clock = pygame.time.Clock()
 
 
 
-velocidade = 10
-
-paredes_fase1 = [
-    pygame.Rect(335, 89, 20, 550), # parede vertical esquerda
-    pygame.Rect(335, 72, 610, 20), # parede superior
-
-    pygame.Rect(335, 615, 610, 20),
-    pygame.Rect(924, 80, 20, 550), #parede vertical direita
+velocidade = 5
 
 
-]
-
-paredes_fase2 = [
-    pygame.Rect(10, 40, 20, 600),
-    pygame.Rect(10, 40, 800, 20),
-
-    
-
-    pygame.Rect(0, 615, 800, 20),
-    pygame.Rect(780, 40, 20, 600),
-
-
-]
-
-paredes_fase3 = [
-
-    pygame.Rect(10, 40, 20, 600),
-    pygame.Rect(10, 40, 800, 20),
-
-    pygame.Rect(400,80,40,500),
-
-    pygame.Rect(0, 615, 800, 20),
-    pygame.Rect(780, 40, 20, 600),
-
-
-
-]
 
 def desenhar_paredes(paredes):
         
@@ -355,40 +305,20 @@ def pause(fase):
 
         pygame.display.update()
 
-
-
-# def colidiu(imagem_rect,paredes,dx,dy):
-#     for parede in paredes:
-        
-
     
 
 def fase1():
-    bloco = Bloco(60,100, id=1)
-    bloco.colisao = False
-    x_textos = largura_janela-300
-    qt_coletados = 0
-
-    q = Bloco(500,200,cor="green")
     
 
-    itens = [q]
 
-
-    
-    
-
-    jogador = Player(457,521)
+    jogador = Player(632,591)
     while True:
         janela.fill((255,255,255))
         janela.blit(fundo,(0,0))
 
         jogador_rect = jogador.player_rect
 
-        desenhar_paredes(paredes_fase1)
-
        
-        
         clock.tick(60)
        
         for event in pygame.event.get():
@@ -397,10 +327,7 @@ def fase1():
                 sys.exit()
 
         
-        for item in itens:
-            q.place()
-   
-
+     
         # Movimento do quadrado principal
         teclas = pygame.key.get_pressed()
         dx, dy = 0, 0
@@ -416,241 +343,19 @@ def fase1():
             pause(fase1)
 
 
-        if jogador_rect.colliderect(botao_up_rect) and bloco.colisao == False:
-            bloco.colisao = True
-            click.play()
-            
-        
-
-
-     
+       
 
         jogador_rect.x +=dx
         jogador_rect.y += dy
 
-        # colidiu(jogador_rect,paredes_fase1,dx,dy)
-
-        for item in range(len(itens)):
-            if jogador_rect.colliderect(itens[item].place()):
-                coletou.play()
-                itens.pop()
-                qt_coletados+=1
-
-
+      
   
-        
-
-              
-    
 
         janela.blit(player,jogador_rect)
 
         pygame.display.update()
 
 
-def fase2():
-    bloco = Bloco(50,200, id=1)
-    
-    bloco.colisao = True
-    qt_coletados =0
-
-    item1 = Bloco(500,200,cor="green")
-    item2 = Bloco(50,400,cor="green")
-    
-
-    itens = [item1,item2]
-
-    while True:
-        janela.fill((255,255,255))
-
-        desenhar_paredes(paredes_fase2)
-
-        t = pygame.Rect(400,80,40,500)
-        f = pygame.draw.rect(janela,(0,0,0),t)
-
-        for item in itens:
-            item.place()
-
-
-
-        clock.tick(60)
-       
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-
-
-        bloco.place()
-
-        # Movimento do quadrado principal
-        teclas = pygame.key.get_pressed()
-        dx, dy = 0, 0
-        if teclas[pygame.K_LEFT] or teclas[pygame.K_a]:
-            dx = -velocidade
-        if teclas[pygame.K_RIGHT] or teclas[pygame.K_d]:
-            dx = velocidade
-        if teclas[pygame.K_UP] or teclas[pygame.K_w]:
-            dy = -velocidade
-        if teclas[pygame.K_DOWN] or teclas[pygame.K_s]:
-            dy = velocidade
-
-        if bloco.place().colliderect(botao_up_rect) and bloco.colisao == True:
-            bloco.colisao = False
-            click.play()
-
-
-
-
-        if bloco.colisao == True:
-            janela.blit(botao_up,botao_up_rect)
-
-            if colidiu(bloco,paredes_fase2,dx,dy) or bloco.place().colliderect(f):
-                pass
-            else:
-                bloco.x +=dx
-                bloco.y +=dy
-        else:
-            janela.blit(botao_down,botao_down_rect)
-            if colidiu(bloco,paredes_fase2):
-                pass
-            else:
-                bloco.x +=dx
-                bloco.y +=dy
-
-          
-            
-    
-        for item in range(len(itens)):
-            if bloco.place().colliderect(itens[item].place()):
-                coletou.play()
-                itens.pop()
-                qt_coletados+=1
-
-        
-        if qt_coletados == 2:
-            fase3()
-            
-
-        colisao_texto = fonte.render(f"Colisao:{bloco.colisao} ",True,(0,0,0))
-        tamanho_texto = fonte.render(f"Tamanho:{bloco.tamanho} ",True,(0,0,0))
-        id_texto = fonte.render(f"Id:{bloco.id} ",True,(0,0,0))
-        coletados = fonte.render(f"coletados:{qt_coletados}/{2}",True,(0,0,0))
-
-        janela.blit(colisao_texto,(largura_janela-200,60))
-        janela.blit(tamanho_texto,(largura_janela-200,100))
-        janela.blit(id_texto,(largura_janela-200,140))
-        janela.blit(coletados,(largura_janela-200,180))
-
-        pygame.display.update()
-
-    
-def fase3():
-    
-    bloco = Bloco(50,200, id=1)
-    bloco.colisao = True
-    qt_coletados =0
-
-    item1 = Bloco(500,200,cor="green")
-    item2 = Bloco(50,400,cor="green")
-    
-
-    itens = [item1,item2]
-
-    bloco2 = Bloco(500,400,id=2,cor=(0,0,0),colisao=True)
-
-    while True:
-        janela.fill((255,255,255))
-
-        desenhar_paredes(paredes_fase3)
-
-        for item in itens:
-            item.place()
-
-
-        clock.tick(60)
-       
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-
-        
-        
-        bloco.place()
-        bloco2.place()
-
-        # Movimento do quadrado principal
-
-        
-        teclas = pygame.key.get_pressed()
-        dx, dy = 0, 0
-        if teclas[pygame.K_LEFT] or teclas[pygame.K_a]:
-            dx = -velocidade
-        if teclas[pygame.K_RIGHT] or teclas[pygame.K_d]:
-            dx = velocidade
-        if teclas[pygame.K_UP] or teclas[pygame.K_w]:
-            dy = -velocidade
-        if teclas[pygame.K_DOWN] or teclas[pygame.K_s]:
-            dy = velocidade
-
-        if bloco.place().colliderect(botao_up_rect) and bloco.id == 1:
-            bloco.id =2
-            bloco.cor = (0,0,0)
-            bloco2.cor = (0,0,255)
-
-            
-            mudar.play()
-              
-        if bloco.id == 1:
-            bloco.dx = dx
-            bloco.dy = dy
-        else:
-            bloco2.dx = dx
-            bloco2.dy = dy
-        
-    
-        if bloco.id == 1:
-            janela.blit(botao_up,botao_up_rect)
-            if bloco.colisao == True:
-                if colidiu(bloco,paredes_fase3):
-                    pass
-                else:
-                    bloco.x +=dx
-                    bloco.y +=dy
-                    
-            for item in range(len(itens)):
-                if bloco.place().colliderect(itens[item].place()):
-                    coletou.play()
-                    itens.pop()
-                    qt_coletados+=1
-
-        else:
-            janela.blit(botao_down,botao_down_rect)
-            if bloco2.colisao == True:
-                if colidiu(bloco2,paredes_fase3):
-                    pass
-                else:
-                    bloco2.x +=dx
-                    bloco2.y +=dy
-                    
-            for item in range(len(itens)):
-                if bloco2.place().colliderect(itens[item].place()):
-                    coletou.play()
-                    itens.pop()
-                    qt_coletados+=1
-
-        colisao_texto = fonte.render(f"Colisao:{bloco.colisao} ",True,(0,0,0))
-        tamanho_texto = fonte.render(f"Tamanho:{bloco.tamanho} ",True,(0,0,0))
-        id_texto = fonte.render(f"Id:{bloco.id} ",True,(0,0,0))
-        coletados = fonte.render(f"coletados:{qt_coletados}/{2}",True,(0,0,0))
-
-        janela.blit(colisao_texto,(largura_janela-200,60))
-        janela.blit(tamanho_texto,(largura_janela-200,100))
-        janela.blit(id_texto,(largura_janela-200,140))
-        janela.blit(coletados,(largura_janela-200,180))
-
-        pygame.display.update()
 
 
 

@@ -21,15 +21,17 @@ class Fase:
         pass
 
     def desenhar(self):
-        pass
+        print("fase 1")
 
 class Fase1(Fase):
     def __init__(self, janela):
-        super().__init__(janela)
+        # super().__init__(janela)
+        pass
 
     def processar_eventos(self):
-        super().processar_eventos()
+        # super().processar_eventos()
         # Lógica específica da Fase 1
+        pass
 
     def atualizar(self):
         # Lógica de atualização específica da Fase 1
@@ -37,7 +39,7 @@ class Fase1(Fase):
 
     def desenhar(self):
         # Desenhar elementos específicos da Fase 1 na tela
-        pass
+        print("fase 2")
 
 class Menu:
     def __init__(self, janela):
@@ -76,7 +78,7 @@ class Menu:
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE and self.indice == 0:
-                    pass
+                    jogo.fase_atual = Fase(self.janela)
                 if event.key == pygame.K_SPACE and self.indice == 2:
                     # cursor_select.play()
                     # tchau()
