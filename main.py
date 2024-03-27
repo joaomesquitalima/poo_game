@@ -22,16 +22,19 @@ parede_direita = 860
 
 largura_janela, altura_janela = 1280,720
 janela = pygame.display.set_mode((largura_janela,altura_janela))
+
+#fontes
 fonte = pygame.font.Font("ThaleahFat.ttf", 50) #fonte media
 fonte_pequena = pygame.font.Font("ThaleahFat.ttf",40)
 fonte_nome = pygame.font.Font("ThaleahFat.ttf",100)
-
 fonte_outros = pygame.font.Font("ThaleahFat.ttf",45)
 
+
+#fundo
 fundo = pygame.image.load("tela_pico8_preta.png")
 fundo = pygame.transform.scale(fundo, (largura_janela, altura_janela))
 
-
+#sons
 menu_selection = pygame.mixer.Sound('audios/menu_selection.wav')
 cursor_select = pygame.mixer.Sound("audios/cursor_select.wav")
 cursor_back = pygame.mixer.Sound("audios/cursor_back.wav")
@@ -39,8 +42,8 @@ mudar = pygame.mixer.Sound("audios/open_001.ogg")
 coletou = pygame.mixer.Sound("audios/coletado.ogg")
 click = pygame.mixer.Sound("audios/click.2.ogg")
 
+#imagens
 player = pygame.image.load("ship_teste.png").convert_alpha()
-
 player = pygame.transform.scale(player,(64,64))
 
 vidas = pygame.image.load("ship_teste.png").convert_alpha()
@@ -48,7 +51,6 @@ vidas = pygame.transform.scale(vidas,(32,32))
 
 enemy = pygame.image.load("alien1.png").convert_alpha()
 enemy = pygame.transform.scale(enemy,(64,64))
-enemy_rect = enemy.get_rect(center = (413,151))
 
 laser = pygame.image.load("blasterbolt.png").convert_alpha()
 laser_rect = laser.get_rect()
@@ -59,7 +61,7 @@ clock = pygame.time.Clock()
 
 
 
-velocidade = 5
+
 
 class Inimigo():
     def __init__(self,img,x,y,life,velocidade):
@@ -93,22 +95,29 @@ class Inimigo():
 
         
             
-    
-
-    
-
-        
 
 class Player():
     def __init__(self,x,y):
         self.x = x
         self.y = y
+        self.velocidade = 5
         
         self.player_rect = player.get_rect(center = (self.x,self.y))
     def atacar(self):
         laser_rect = laser.get_rect(center=(self.x,self.y))
         
         janela.blit(laser,laser_rect)
+
+    def move(self):
+        # Movimento da nave principal
+        teclas = pygame.key.get_pressed()
+        dx= 0
+        if teclas[pygame.K_LEFT] or teclas[pygame.K_a] and self.player_rect.x > parede_esquerda:
+            dx = -self.velocidade
+        if teclas[pygame.K_RIGHT] or teclas[pygame.K_d] and self.player_rect.x < parede_direita:
+            dx = self.velocidade
+        
+        self.player_rect.x+=dx
 
 
 def menu():
@@ -306,32 +315,20 @@ def fase1():
                     jogador.atacar()
 
       
-        # Movimento da nave principal
-        teclas = pygame.key.get_pressed()
-        dx= 0
-        if teclas[pygame.K_LEFT] or teclas[pygame.K_a] and jogador_rect.x > parede_esquerda:
-            dx = -velocidade
-        if teclas[pygame.K_RIGHT] or teclas[pygame.K_d] and jogador_rect.x < parede_direita:
-            dx = velocidade
-        
-        jogador_rect.x+=dx
-
-
+        jogador.move()
         
 
         enemy.move()
         enemy2.move()
         enemy3.move()
 
+
         score = fonte_pequena.render(f"Score: {pontos}",True,(255,255,255))
         vidas = fonte_pequena.render("Life:",True,(255,255,255))
 
         
-
-      
   
         janela.blit(player,jogador_rect)
-        
         janela.blit(score,(parede_esquerda +4,90))
         janela.blit(vidas,(parede_esquerda +4,127))
 
