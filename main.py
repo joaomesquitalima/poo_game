@@ -103,11 +103,12 @@ class Inimigo():
             
 
 class Player():
-    def __init__(self,x,y):
+    def __init__(self,x,y,life=4):
         self.x = x
         self.y = y
         self.velocidade = 5
         self.laser_list = []
+        self.life = life
         
         self.player_rect = player.get_rect(center = (self.x,self.y))
     def atacar(self):
@@ -116,6 +117,13 @@ class Player():
         self.laser_list.append(laser_rect)
         fire.play()
 
+    def updata_life(self,lista_enemys):
+        for i in range(1,self.life+1):
+            janela.blit(vidas,(parede_esquerda + i*40 + 50,130))
+            
+            for enemy in lista_enemys:
+                if enemy.img_rect.colliderect(self.player_rect):
+                    self.life -= 1
         
 
     def move(self):
@@ -340,8 +348,15 @@ def fase1():
     enemy2 = Inimigo("alien1.png",600,250,1,3)
     enemy3 = Inimigo("alien1.png",390,300,1,3)
 
+    enemy4 = Inimigo("alien1.png",490,200,1,3)
+    enemy5 = Inimigo("alien1.png",600,250,1,3)
+    enemy6 = Inimigo("alien1.png",390,300,1,3)
+
     list_enemys = [enemy,enemy2,enemy3]
-    
+
+    lista2_enemys = [enemy4,enemy5,enemy6]
+
+
     
     pontos = 0
     while True:
@@ -367,12 +382,16 @@ def fase1():
 
       
         jogador.move()
+        
         if jogador.draw(list_enemys):
             pontos+=1
         
 
         for enemy in list_enemys:
             enemy.move()
+
+        if len(list_enemys) == 0:
+            list_enemys = lista2_enemys
 
         
 
@@ -386,6 +405,7 @@ def fase1():
         janela.blit(player,jogador_rect)
         janela.blit(score,(parede_esquerda +4,90))
         janela.blit(vidas,(parede_esquerda +4,127))
+        jogador.updata_life(list_enemys)
 
         pygame.display.update()
 
