@@ -34,6 +34,10 @@ fonte_outros = pygame.font.Font("ThaleahFat.ttf",45)
 fundo = pygame.image.load("tela_pico8_preta.png")
 fundo = pygame.transform.scale(fundo, (largura_janela, altura_janela))
 
+fundo_desligado = pygame.image.load("tela_pico8_desligado.png")
+fundo_desligado = pygame.transform.scale(fundo_desligado, (largura_janela, altura_janela))
+
+
 #sons
 menu_selection = pygame.mixer.Sound('audios/menu_selection.wav')
 cursor_select = pygame.mixer.Sound("audios/cursor_select.wav")
@@ -41,6 +45,8 @@ cursor_back = pygame.mixer.Sound("audios/cursor_back.wav")
 mudar = pygame.mixer.Sound("audios/open_001.ogg")
 coletou = pygame.mixer.Sound("audios/coletado.ogg")
 click = pygame.mixer.Sound("audios/click.2.ogg")
+fire = pygame.mixer.Sound("Shoot_01.mp3")
+esplosao = pygame.mixer.Sound("explosion.mp3")
 
 #imagens
 player = pygame.image.load("ship_teste.png").convert_alpha()
@@ -101,12 +107,16 @@ class Player():
         self.x = x
         self.y = y
         self.velocidade = 5
+        self.laser_list = []
         
         self.player_rect = player.get_rect(center = (self.x,self.y))
     def atacar(self):
-        laser_rect = laser.get_rect(center=(self.x,self.y))
+        # print(len(self.laser_list))
+        laser_rect = laser.get_rect(center=(self.player_rect.x+34,self.player_rect.y))
+        self.laser_list.append(laser_rect)
+        fire.play()
+
         
-        janela.blit(laser,laser_rect)
 
     def move(self):
         # Movimento da nave principal
@@ -119,9 +129,45 @@ class Player():
         
         self.player_rect.x+=dx
 
+    def draw(self,lista_enemys):
+            
+        for rect in self.laser_list:
+            rect.y -= 10
+
+            if rect.y < 100:
+                self.laser_list.remove(rect)
+            for enemy in lista_enemys:
+                if enemy.img_rect.colliderect(rect):
+                    lista_enemys.remove(enemy)
+                    self.laser_list.remove(rect)
+                    esplosao.play()
+                    return True
+
+        
+            janela.blit(laser,rect)
+        
+
+
+
+def off():
+    while True:
+        janela.fill((255,255,255))
+        janela.blit(fundo_desligado,(0,0))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.KEYDOWN:
+                menu()
+
+        pygame.display.update()
+
+
 
 def menu():
-        # Carregue a música
+    # Carregue a música
     pygame.mixer.music.load('musica/menu.mp3')
 
     
@@ -293,6 +339,8 @@ def fase1():
     enemy = Inimigo("alien1.png",490,200,1,3)
     enemy2 = Inimigo("alien1.png",600,250,1,3)
     enemy3 = Inimigo("alien1.png",390,300,1,3)
+
+    list_enemys = [enemy,enemy2,enemy3]
     
     
     pontos = 0
@@ -313,14 +361,21 @@ def fase1():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     jogador.atacar()
+                    
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                jogador.atacar()
 
       
         jogador.move()
+        if jogador.draw(list_enemys):
+            pontos+=1
         
 
-        enemy.move()
-        enemy2.move()
-        enemy3.move()
+        for enemy in list_enemys:
+            enemy.move()
+
+        
+
 
 
         score = fonte_pequena.render(f"Score: {pontos}",True,(255,255,255))
@@ -340,4 +395,4 @@ def fase1():
 
 
 
-menu()
+off()
