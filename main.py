@@ -132,9 +132,9 @@ class Player():
         # Movimento da nave principal
         teclas = pygame.key.get_pressed()
         dx= 0
-        if teclas[pygame.K_LEFT] or teclas[pygame.K_a] and self.player_rect.x > parede_esquerda:
+        if (teclas[pygame.K_LEFT] or teclas[pygame.K_a]) and self.player_rect.x > parede_esquerda:
             dx = -self.velocidade
-        if teclas[pygame.K_RIGHT] or teclas[pygame.K_d] and self.player_rect.x < parede_direita:
+        if (teclas[pygame.K_RIGHT] or teclas[pygame.K_d] ) and self.player_rect.x < parede_direita:
             dx = self.velocidade
         
         self.player_rect.x+=dx
