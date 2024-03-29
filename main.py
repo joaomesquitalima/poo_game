@@ -118,10 +118,13 @@ class Player():
     def atacar(self):
         # print(len(self.laser_list))
         laser_rect = laser.get_rect(center=(self.player_rect.x+34,self.player_rect.y))
+        if len(self.laser_list) > 1:
+            pass
+        else:
         
-        self.laser_list.append(laser_rect)
+            self.laser_list.append(laser_rect)
         
-        fire.play()
+            fire.play()
 
     def updata_life(self,lista_enemys=None):
         for i in range(1,self.life+1):
@@ -233,7 +236,6 @@ def menu():
     
 
     # Defina o volume (opcional)
-
     pygame.mixer.music.set_volume(0.1)  # Valor varia de 0.0 a 1.0
     
     pygame.mixer.music.play(-1)
