@@ -46,10 +46,11 @@ menu_selection = pygame.mixer.Sound('audios/menu_selection.wav')
 cursor_select = pygame.mixer.Sound("audios/cursor_select.wav")
 cursor_back = pygame.mixer.Sound("audios/cursor_back.wav")
 mudar = pygame.mixer.Sound("audios/open_001.ogg")
-coletou = pygame.mixer.Sound("audios/coletado.ogg")
-click = pygame.mixer.Sound("audios/click.2.ogg")
+
 fire = pygame.mixer.Sound("audios/Shoot_01.mp3")
+fire.set_volume(0.7)
 esplosao = pygame.mixer.Sound("audios/explosion.mp3")
+esplosao.set_volume(0.7)
 
 #imagens
 player = pygame.image.load("imagens/ship.png").convert_alpha()
@@ -117,17 +118,21 @@ class Player():
     def atacar(self):
         # print(len(self.laser_list))
         laser_rect = laser.get_rect(center=(self.player_rect.x+34,self.player_rect.y))
+        
         self.laser_list.append(laser_rect)
+        
         fire.play()
 
-    def updata_life(self,lista_enemys):
+    def updata_life(self,lista_enemys=None):
         for i in range(1,self.life+1):
             janela.blit(vidas,(parede_esquerda + i*40 + 50,130))
+
+            if lista_enemys != None:
             
-            for enemy in lista_enemys:
-                if enemy.img_rect.colliderect(self.player_rect):
-                    self.life -= 1
-        
+                for enemy in lista_enemys:
+                    if enemy.img_rect.colliderect(self.player_rect):
+                        self.life -= 1
+            
 
     def move(self):
         # Movimento da nave principal
@@ -150,12 +155,20 @@ class Player():
             
         
             janela.blit(laser,rect)
+
     def colidir(self,lista_enemys=False,boss=None):
         if lista_enemys == False:
             for rect in self.laser_list:
-                if boss.colliderect(rect):
-                    self.laser_list.remove(rect)
-                    esplosao.play()
+                for bullet in boss.lista_bullet:
+                    if boss.rect.colliderect(rect) and boss.opacidade > 180:
+                        boss.life-= 1
+                        self.laser_list.remove(rect)
+                        esplosao.play()
+
+                    
+                    if bullet.colliderect(rect):
+                        
+                        boss.lista_bullet.remove(bullet)
         else:
             for rect in self.laser_list:
                 for enemy in lista_enemys:
@@ -180,24 +193,49 @@ def off():
                 sys.exit()
 
             if event.type == pygame.KEYDOWN:
-                pygame.time.wait(500)
-                menu()
+                
+                transicao(menu,"ligando")
 
         pygame.display.update()
 
+
+
+def transicao(fase,texto):
+    
+    
+    while True:
+        janela.fill((0,0,0))
+        janela.blit(fundo,(0,0))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        
+
+        texto = fonte.render(texto,True,(255,255,255))
+        texto_rect = texto.get_rect(center=(largura_janela/2,altura_janela/2))
+        janela.blit(texto,texto_rect)
+        
+        
+
+        pygame.display.update()
+        pygame.time.wait(2000)
+        fase()
 
 
 
 def menu():
     # Carregue a música
     pygame.mixer.music.load('musica/menu.mp3')
-
+    
     
 
     # Defina o volume (opcional)
-    pygame.mixer.music.set_volume(0.5)  # Valor varia de 0.0 a 1.0
 
-    # Reproduza a música em loop infinito (-1 significa loop infinito)
+    pygame.mixer.music.set_volume(0.1)  # Valor varia de 0.0 a 1.0
+    
     pygame.mixer.music.play(-1)
 
 
@@ -208,9 +246,8 @@ def menu():
     # pygame.time.set_timer(teste,200)
     while True:
         
-        # Obtenha a posição do mouse
-        posicao_mouse = pygame.mouse.get_pos()
-        print(posicao_mouse)
+        
+   
         janela.fill((255,255,255))
         janela.blit(fundo,(0,0))
 
@@ -242,7 +279,9 @@ def menu():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE and indice == 0:
-                    fase1()
+                    pygame.mixer.music.stop()
+                    transicao(fase1,"Fase 1")
+                    
                 if event.key == pygame.K_SPACE and indice == 2:
                     cursor_select.play()
                     tchau()
@@ -360,26 +399,58 @@ def tchau():
 
 def final():
     jogador = Player(632,591)
+    jogador.laser_list = []
+    
+   
+    pygame.mixer.music.load("boss_music.mpeg")
+
+    pygame.mixer.music.play(-1)
+    pygame.mixer.music.set_volume(1)
+
+    boss_nascendo = pygame.mixer.Sound("boss_nascendo.mp3")
+    boss_nascendo.play()
+
 
     moving_sprites = pygame.sprite.Group()
-    boss = Boss(550,120)
+    boss = Boss(largura_janela/2,altura_janela/2 - 100,100)
     moving_sprites.add(boss)
+
+    # Defina um evento personalizado
+    inicio_ataque= pygame.USEREVENT + 1
+
+    padrao1 = pygame.USEREVENT + 2
+
+    pygame.time.set_timer(inicio_ataque, 5 * 1000)
+
+    pygame.time.set_timer(padrao1, 1000)
+
+    ataque = False
+
     while True:
+        clock.tick(60)
         janela.fill((255,255,255))
         janela.blit(fundo,(0,0))
+        boss.ai()
 
         jogador_rect = jogador.player_rect
         jogador.draw()
+        
 
-        jogador.colidir(lista_enemys=False,boss=boss.rect)
+        jogador.colidir(lista_enemys=False,boss=boss)
 
-       
-        clock.tick(60)
+
        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
+            if event.type == inicio_ataque:
+                ataque = True
+
+            if ataque and event.type == padrao1:
+                boss.atack(jogador_rect.x - 65)
+                
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
@@ -390,9 +461,20 @@ def final():
 
       
         jogador.move()
+
+
         moving_sprites.draw(janela)
-        moving_sprites.update()
+        moving_sprites.update(janela,jogador_rect.x - 50)
+        
+        
         janela.blit(player,jogador_rect)
+
+        
+
+        
+        vidas = fonte_pequena.render("Life:",True,(255,255,255))
+        janela.blit(vidas,(parede_esquerda +4,127))
+        jogador.updata_life(None)
 
         pygame.display.update()
         
@@ -404,7 +486,7 @@ def final():
 def fase1():
     
 
-
+    
     jogador = Player(632,591)
     enemy = Inimigo("imagens/alien.png",490,200,1,3)
     enemy2 = Inimigo("imagens/alien.png",600,250,1,3)
@@ -461,7 +543,7 @@ def fase1():
             enemy.move()
 
         if len(list_enemys) == 0:
-            final()
+            transicao(final,"BOSS FINAL !")
 
         
 
