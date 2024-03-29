@@ -1,18 +1,6 @@
 import pygame
-# import sys
 
-# # Inicialize o Pygame
-# pygame.init()
 
-# # Defina o tamanho da janela
-# largura_janela = 800
-# altura_janela = 600
-
-# # Crie a janela
-# janela = pygame.display.set_mode((largura_janela, altura_janela))
-
-# # Defina o título da janela
-# pygame.display.set_caption("Janela Vazia")
 
 
 class Boss(pygame.sprite.Sprite):
@@ -38,27 +26,5 @@ class Boss(pygame.sprite.Sprite):
         self.image = self.sprites[int(self.image_atual)]
         
 
-        
+    
 
-# moving_sprites = pygame.sprite.Group()
-# boss = Boss(100,100)
-
-# moving_sprites.add(boss)
-
-
-# clock = pygame.time.Clock()
-# while True:
-#     clock.tick(60)
-#     janela.fill((255,255,255))
-#     for event in pygame.event.get():
-#         if event.type == pygame.QUIT:
-#             pygame.quit()
-#             sys.exit()
-
-   
-
-
-#     # Atualize a 
-#     moving_sprites.draw(janela)
-#     moving_sprites.update()
-#     pygame.display.update()

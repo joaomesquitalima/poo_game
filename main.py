@@ -140,22 +140,31 @@ class Player():
         
         self.player_rect.x+=dx
 
-    def draw(self,lista_enemys):
+    def draw(self):
             
         for rect in self.laser_list:
             rect.y -= 10
 
             if rect.y < 100:
                 self.laser_list.remove(rect)
-            for enemy in lista_enemys:
-                if enemy.img_rect.colliderect(rect):
-                    lista_enemys.remove(enemy)
-                    self.laser_list.remove(rect)
-                    esplosao.play()
-                    return True
-
+            
         
             janela.blit(laser,rect)
+    def colidir(self,lista_enemys=False,boss=None):
+        if lista_enemys == False:
+            for rect in self.laser_list:
+                if boss.colliderect(rect):
+                    self.laser_list.remove(rect)
+                    esplosao.play()
+        else:
+            for rect in self.laser_list:
+                for enemy in lista_enemys:
+                    if enemy.img_rect.colliderect(rect):
+                        lista_enemys.remove(enemy)
+                        self.laser_list.remove(rect)
+                        esplosao.play()
+                        return True
+
         
 
 
@@ -362,6 +371,8 @@ def final():
         jogador_rect = jogador.player_rect
         jogador.draw()
 
+        jogador.colidir(lista_enemys=False,boss=boss.rect)
+
        
         clock.tick(60)
        
@@ -439,9 +450,11 @@ def fase1():
 
       
         jogador.move()
+        jogador.draw()
         
-        if jogador.draw(list_enemys):
+        if jogador.colidir(list_enemys):
             pontos+=1
+        
         
 
         for enemy in list_enemys:
