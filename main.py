@@ -1,6 +1,6 @@
 import pygame,sys
 import time
-
+import random
 pygame.init()
 
 
@@ -26,17 +26,17 @@ largura_janela, altura_janela = 1280,720
 janela = pygame.display.set_mode((largura_janela,altura_janela))
 
 #fontes
-fonte = pygame.font.Font("ThaleahFat.ttf", 50) #fonte media
-fonte_pequena = pygame.font.Font("ThaleahFat.ttf",40)
-fonte_nome = pygame.font.Font("ThaleahFat.ttf",100)
-fonte_outros = pygame.font.Font("ThaleahFat.ttf",45)
+fonte = pygame.font.Font("fontes/ThaleahFat.ttf", 50) #fonte media
+fonte_pequena = pygame.font.Font("fontes/ThaleahFat.ttf",40)
+fonte_nome = pygame.font.Font("fontes/ThaleahFat.ttf",100)
+fonte_outros = pygame.font.Font("fontes/ThaleahFat.ttf",45)
 
 
 #fundo
-fundo = pygame.image.load("tela_pico8_preta.png")
+fundo = pygame.image.load("imagens/tela_pico8_preta.png")
 fundo = pygame.transform.scale(fundo, (largura_janela, altura_janela))
 
-fundo_desligado = pygame.image.load("tela_pico8_desligado.png")
+fundo_desligado = pygame.image.load("imagens/tela_pico8_desligado.png")
 fundo_desligado = pygame.transform.scale(fundo_desligado, (largura_janela, altura_janela))
 
 
@@ -47,20 +47,20 @@ cursor_back = pygame.mixer.Sound("audios/cursor_back.wav")
 mudar = pygame.mixer.Sound("audios/open_001.ogg")
 coletou = pygame.mixer.Sound("audios/coletado.ogg")
 click = pygame.mixer.Sound("audios/click.2.ogg")
-fire = pygame.mixer.Sound("Shoot_01.mp3")
-esplosao = pygame.mixer.Sound("explosion.mp3")
+fire = pygame.mixer.Sound("audios/Shoot_01.mp3")
+esplosao = pygame.mixer.Sound("audios/explosion.mp3")
 
 #imagens
-player = pygame.image.load("ship_teste.png").convert_alpha()
+player = pygame.image.load("imagens/ship.png").convert_alpha()
 player = pygame.transform.scale(player,(64,64))
 
-vidas = pygame.image.load("ship_teste.png").convert_alpha()
+vidas = pygame.image.load("imagens/ship.png").convert_alpha()
 vidas = pygame.transform.scale(vidas,(32,32))
 
-enemy = pygame.image.load("alien1.png").convert_alpha()
+enemy = pygame.image.load("imagens/alien.png").convert_alpha()
 enemy = pygame.transform.scale(enemy,(64,64))
 
-laser = pygame.image.load("blasterbolt.png").convert_alpha()
+laser = pygame.image.load("imagens/blasterbolt.png").convert_alpha()
 laser_rect = laser.get_rect()
 
 
@@ -341,22 +341,61 @@ def tchau():
 
     
 
+
+
+def boss():
+    jogador = Player(632,591)
+    while True:
+        janela.fill((255,255,255))
+        janela.blit(fundo,(0,0))
+
+        jogador_rect = jogador.player_rect
+
+       
+        clock.tick(60)
+       
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    jogador.atacar()
+                    
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                jogador.atacar()
+
+      
+        jogador.move()
+        
+        
+
+
+
+
 def fase1():
     
 
 
     jogador = Player(632,591)
-    enemy = Inimigo("alien1.png",490,200,1,3)
-    enemy2 = Inimigo("alien1.png",600,250,1,3)
-    enemy3 = Inimigo("alien1.png",390,300,1,3)
+    enemy = Inimigo("imagens/alien.png",490,200,1,3)
+    enemy2 = Inimigo("imagens/alien.png",600,250,1,3)
+    enemy3 = Inimigo("imagens/alien.png",390,300,1,3)
 
-    enemy4 = Inimigo("alien1.png",490,200,1,3)
-    enemy5 = Inimigo("alien1.png",600,250,1,3)
-    enemy6 = Inimigo("alien1.png",390,300,1,3)
+    enemy4 = Inimigo("imagens/alien.png",490,200,1,3)
+    enemy5 = Inimigo("imagens/alien.png",600,250,1,3)
+    enemy6 = Inimigo("imagens/alien.png",390,300,1,3)
+
+    enemy7 = Inimigo("imagens/alien.png",490,200,1,3)
+    enemy8 = Inimigo("imagens/alien.png",600,250,1,3)
+    enemy9 = Inimigo("imagens/alien.png",390,300,1,3)
 
     list_enemys = [enemy,enemy2,enemy3]
 
     lista2_enemys = [enemy4,enemy5,enemy6]
+
+    lista3_enemys = [enemy7,enemy8,enemy9]
 
 
     
@@ -401,6 +440,12 @@ def fase1():
 
         score = fonte_pequena.render(f"Score: {pontos}",True,(255,255,255))
         vidas = fonte_pequena.render("Life:",True,(255,255,255))
+
+        # for i in range(2):
+          
+        #     x = random.randint(parede_esquerda, parede_direita )  # Posição x aleatória
+        #     y = random.randint(0, altura_janela )  # Posição y aleatória
+        #     pygame.draw.rect(janela, (255,255,255), (x, y, 20, 20))
 
         
   
