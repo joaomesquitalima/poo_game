@@ -1,6 +1,7 @@
 import pygame,sys
 import time
 import random
+from game import Boss
 pygame.init()
 
 
@@ -170,9 +171,11 @@ def off():
                 sys.exit()
 
             if event.type == pygame.KEYDOWN:
+                pygame.time.wait(500)
                 menu()
 
         pygame.display.update()
+
 
 
 
@@ -193,7 +196,9 @@ def menu():
     indice = 0
     azul = (0,0,255)
     preto = (255,255,255)
+    # pygame.time.set_timer(teste,200)
     while True:
+        
         # Obtenha a posição do mouse
         posicao_mouse = pygame.mouse.get_pos()
         print(posicao_mouse)
@@ -210,6 +215,7 @@ def menu():
         
 
             if botao_x and indice == 0:
+                
                 fase1()
 
             if up:
@@ -343,13 +349,18 @@ def tchau():
 
 
 
-def boss():
+def final():
     jogador = Player(632,591)
+
+    moving_sprites = pygame.sprite.Group()
+    boss = Boss(550,120)
+    moving_sprites.add(boss)
     while True:
         janela.fill((255,255,255))
         janela.blit(fundo,(0,0))
 
         jogador_rect = jogador.player_rect
+        jogador.draw()
 
        
         clock.tick(60)
@@ -368,6 +379,11 @@ def boss():
 
       
         jogador.move()
+        moving_sprites.draw(janela)
+        moving_sprites.update()
+        janela.blit(player,jogador_rect)
+
+        pygame.display.update()
         
         
 
@@ -432,7 +448,7 @@ def fase1():
             enemy.move()
 
         if len(list_enemys) == 0:
-            list_enemys = lista2_enemys
+            final()
 
         
 
