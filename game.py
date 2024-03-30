@@ -36,6 +36,7 @@ class Boss(pygame.sprite.Sprite):
         # self.image = imagem_opaca
         self.opacidade+=0.4
         # print(self.opacidade)
+        print(self.life)
 
         for bala in self.lista_bullet:
             bala.y += 10

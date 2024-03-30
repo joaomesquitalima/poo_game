@@ -27,6 +27,7 @@ largura_janela, altura_janela = 1280,720
 janela = pygame.display.set_mode((largura_janela,altura_janela))
 
 #fontes
+fonte_terraria = pygame.font.Font("Terraria-Font/ANDYB.TTF",40)
 fonte = pygame.font.Font("fontes/ThaleahFat.ttf", 50) #fonte media
 fonte_pequena = pygame.font.Font("fontes/ThaleahFat.ttf",40)
 fonte_nome = pygame.font.Font("fontes/ThaleahFat.ttf",100)
@@ -161,17 +162,31 @@ class Player():
 
     def colidir(self,lista_enemys=False,boss=None):
         if lista_enemys == False:
-            for rect in self.laser_list:
-                for bullet in boss.lista_bullet:
-                    if boss.rect.colliderect(rect) and boss.opacidade > 180:
-                        boss.life-= 1
-                        self.laser_list.remove(rect)
-                        esplosao.play()
+           
 
+            for rect in self.laser_list:
+            # se boss colidir com laser
+                if (boss.rect.colliderect(rect) and boss.opacidade > 180):
+                    boss.life-= 1
+                    self.laser_list.remove(rect)
+                    esplosao.play()
+
+                for bullet in boss.lista_bullet:
+                    
                     
                     if bullet.colliderect(rect):
-                        
+                        # self.laser_list.remove(rect)
                         boss.lista_bullet.remove(bullet)
+                        
+                    
+
+               
+            for bullet in boss.lista_bullet:
+                if self.player_rect.colliderect(bullet):
+                    boss.lista_bullet.remove(bullet)
+                    self.life -= 1
+                        
+
         else:
             for rect in self.laser_list:
                 for enemy in lista_enemys:
@@ -182,8 +197,6 @@ class Player():
                         return True
 
         
-
-
 
 def off():
     while True:
@@ -256,14 +269,10 @@ def menu():
         if pygame.joystick.get_count() == 0:
             pass
         else:
-
             botao_x = controle_ps4.get_button(0) 
-            
             up = controle_ps4.get_button(11)
         
-
-            if botao_x and indice == 0:
-                
+            if botao_x and indice == 0:        
                 fase1()
 
             if up:
@@ -287,6 +296,7 @@ def menu():
                 if event.key == pygame.K_SPACE and indice == 2:
                     cursor_select.play()
                     tchau()
+
                 if event.key == pygame.K_s:
                     menu_selection.play()
                     indice = indice +1
@@ -424,9 +434,12 @@ def final():
 
     pygame.time.set_timer(inicio_ataque, 5 * 1000)
 
-    pygame.time.set_timer(padrao1, 1000)
+    pygame.time.set_timer(padrao1, 500)
 
     ataque = False
+
+    texto =  fonte_terraria.render("Cérebro de Cthulhu nasceu",True,(255,255,255))
+    texto_rect = texto.get_rect(center = (largura_janela/2,altura_janela/2))
 
     while True:
         clock.tick(60)
@@ -439,6 +452,9 @@ def final():
         
 
         jogador.colidir(lista_enemys=False,boss=boss)
+
+        if ataque == False:
+            janela.blit(texto,texto_rect)
 
 
        
@@ -481,7 +497,6 @@ def final():
         pygame.display.update()
         
         
-
 
 
 
@@ -540,25 +555,15 @@ def fase1():
             pontos+=1
         
         
-
         for enemy in list_enemys:
             enemy.move()
 
         if len(list_enemys) == 0:
             transicao(final,"BOSS FINAL !")
 
-        
-
-
 
         score = fonte_pequena.render(f"Score: {pontos}",True,(255,255,255))
         vidas = fonte_pequena.render("Life:",True,(255,255,255))
-
-        # for i in range(2):
-          
-        #     x = random.randint(parede_esquerda, parede_direita )  # Posição x aleatória
-        #     y = random.randint(0, altura_janela )  # Posição y aleatória
-        #     pygame.draw.rect(janela, (255,255,255), (x, y, 20, 20))
 
         
   
@@ -568,9 +573,6 @@ def fase1():
         jogador.updata_life(list_enemys)
 
         pygame.display.update()
-
-
-
 
 
 
