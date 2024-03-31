@@ -261,11 +261,9 @@ def menu():
     indice = 0
     azul = (0,0,255)
     preto = (255,255,255)
-    # pygame.time.set_timer(teste,200)
+   
     while True:
         
-        
-   
         janela.fill((255,255,255))
         janela.blit(fundo,(0,0))
 
@@ -498,35 +496,15 @@ def final():
         jogador.updata_life(None)
 
         pygame.display.update()
-        
-        
 
 
-
-def fase1():
-    
-
-    
+def fase4():
     jogador = Player(632,591)
-    enemy = Inimigo("imagens/alien.png",490,200,5,3)
-    enemy2 = Inimigo("imagens/alien.png",600,250,5,3)
-    enemy3 = Inimigo("imagens/alien.png",390,300,5,3)
-
-    enemy4 = Inimigo("imagens/alien.png",490,200,5,3)
-    enemy5 = Inimigo("imagens/alien.png",600,250,5,3)
-    enemy6 = Inimigo("imagens/alien.png",390,300,5,3)
-
-    enemy7 = Inimigo("imagens/alien.png",490,200,5,3)
-    enemy8 = Inimigo("imagens/alien.png",600,250,5,3)
-    enemy9 = Inimigo("imagens/alien.png",390,300,5,3)
+    enemy = Inimigo("imagens/alien.png",parede_esquerda+20,200,5,3)
+    enemy2 = Inimigo("imagens/alien.png",parede_direita-20,250,5,3)
+    enemy3 = Inimigo("imagens/alien.png",490,300,5,3)
 
     list_enemys = [enemy,enemy2,enemy3]
-
-    lista2_enemys = [enemy4,enemy5,enemy6]
-
-    lista3_enemys = [enemy7,enemy8,enemy9]
-
-
     
     pontos = 0
     while True:
@@ -563,6 +541,185 @@ def fase1():
 
         if len(list_enemys) == 0:
             transicao(final,"BOSS FINAL !")
+            # transicao(fase2,"Fase 2")
+
+
+        score = fonte_pequena.render(f"Score: {pontos}",True,(255,255,255))
+        vidas = fonte_pequena.render("Life:",True,(255,255,255))
+
+        
+  
+        janela.blit(player,jogador_rect)
+        janela.blit(score,(parede_esquerda +4,90))
+        janela.blit(vidas,(parede_esquerda +4,127))
+        jogador.updata_life(list_enemys)
+
+        pygame.display.update()
+
+
+def fase3():
+    jogador = Player(632,591)
+    enemy = Inimigo("imagens/alien.png",490,200,5,3)
+    enemy2 = Inimigo("imagens/alien.png",600,250,5,3)
+    enemy3 = Inimigo("imagens/alien.png",390,300,5,3)
+
+    list_enemys = [enemy,enemy2,enemy3]
+    
+    pontos = 0
+    while True:
+        janela.fill((255,255,255))
+        janela.blit(fundo,(0,0))
+
+        jogador_rect = jogador.player_rect
+
+       
+        clock.tick(60)
+       
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    jogador.atacar()
+                    
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                jogador.atacar()
+
+      
+        jogador.move()
+        jogador.draw()
+        
+        if jogador.colidir(list_enemys):
+            pontos+=1
+        
+        
+        for enemy in list_enemys:
+            enemy.move()
+
+        if len(list_enemys) == 0:
+            # transicao(final,"BOSS FINAL !")
+            transicao(fase4,"Fase 4")
+
+
+        score = fonte_pequena.render(f"Score: {pontos}",True,(255,255,255))
+        vidas = fonte_pequena.render("Life:",True,(255,255,255))
+
+        
+  
+        janela.blit(player,jogador_rect)
+        janela.blit(score,(parede_esquerda +4,90))
+        janela.blit(vidas,(parede_esquerda +4,127))
+        jogador.updata_life(list_enemys)
+
+        pygame.display.update()
+        
+        
+
+def fase2():
+    jogador = Player(632,591)
+    enemy = Inimigo("imagens/alien.png",490,200,5,3)
+    enemy2 = Inimigo("imagens/alien.png",600,250,5,3)
+    enemy3 = Inimigo("imagens/alien.png",390,300,5,3)
+
+    list_enemys = [enemy,enemy2,enemy3]
+    
+    pontos = 0
+    while True:
+        janela.fill((255,255,255))
+        janela.blit(fundo,(0,0))
+
+        jogador_rect = jogador.player_rect
+
+       
+        clock.tick(60)
+       
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    jogador.atacar()
+                    
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                jogador.atacar()
+
+      
+        jogador.move()
+        jogador.draw()
+        
+        if jogador.colidir(list_enemys):
+            pontos+=1
+        
+        
+        for enemy in list_enemys:
+            enemy.move()
+
+        if len(list_enemys) == 0:
+            # transicao(final,"BOSS FINAL !")
+            transicao(fase3,"Fase 3")
+
+
+        score = fonte_pequena.render(f"Score: {pontos}",True,(255,255,255))
+        vidas = fonte_pequena.render("Life:",True,(255,255,255))
+
+        
+  
+        janela.blit(player,jogador_rect)
+        janela.blit(score,(parede_esquerda +4,90))
+        janela.blit(vidas,(parede_esquerda +4,127))
+        jogador.updata_life(list_enemys)
+
+        pygame.display.update()
+
+def fase1():
+    
+    jogador = Player(632,591)
+    enemy = Inimigo("imagens/alien.png",490,200,5,3)
+    enemy2 = Inimigo("imagens/alien.png",600,250,5,3)
+    enemy3 = Inimigo("imagens/alien.png",390,300,5,3)
+
+    list_enemys = [enemy,enemy2,enemy3]
+    
+    pontos = 0
+    while True:
+        janela.fill((255,255,255))
+        janela.blit(fundo,(0,0))
+
+        jogador_rect = jogador.player_rect
+
+       
+        clock.tick(60)
+       
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    jogador.atacar()
+                    
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                jogador.atacar()
+
+      
+        jogador.move()
+        jogador.draw()
+        
+        if jogador.colidir(list_enemys):
+            pontos+=1
+        
+        
+        for enemy in list_enemys:
+            enemy.move()
+
+        if len(list_enemys) == 0:
+            # transicao(final,"BOSS FINAL !")
+            transicao(fase2,"Fase 2")
 
 
         score = fonte_pequena.render(f"Score: {pontos}",True,(255,255,255))
