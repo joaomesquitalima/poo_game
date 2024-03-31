@@ -1,8 +1,6 @@
 import pygame
 
 
-
-
 class Boss(pygame.sprite.Sprite):
     def __init__(self,pos_x,pos_y,life):
         super().__init__()
@@ -31,9 +29,8 @@ class Boss(pygame.sprite.Sprite):
 
         self.image = self.sprites[int(self.image_atual)]
         self.imge = pygame.transform.scale(self.image,(64,64))
-        # imagem_opaca = self.image.copy()
-        # imagem_opaca.fill((255, 255, 255, 60), None, pygame.BLEND_RGBA_MULT)
-        # self.image = imagem_opaca
+       
+        
         self.opacidade+=0.4
         # print(self.opacidade)
         print(self.life)

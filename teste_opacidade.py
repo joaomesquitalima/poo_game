@@ -14,7 +14,7 @@ pygame.display.set_caption("Janela Vazia")
 imagem = pygame.image.load("frames_output/frame_000.png").convert_alpha()
 
 # Defina a opacidade desejada (0 a 255)
-opacidade = 128  # Por exemplo, defina a opacidade para 50%
+opacidade = 220  # Por exemplo, defina a opacidade para 50%
 
 # Crie uma cópia da imagem com transparência e opacidade ajustada
 imagem_opaca = imagem.copy()

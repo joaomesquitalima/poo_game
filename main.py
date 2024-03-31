@@ -1,14 +1,13 @@
 import pygame,sys
 import time
 import random
+
 from game import Boss
 pygame.init()
 
-
-
-
 # Inicialize os dispositivos de joystick
 pygame.joystick.init()
+
 
 # Verifique se há pelo menos um joystick conectado
 if pygame.joystick.get_count() == 0:
@@ -26,9 +25,10 @@ parede_direita = 860
 largura_janela, altura_janela = 1280,720
 janela = pygame.display.set_mode((largura_janela,altura_janela))
 
-#fontes
+
+#fontes de texto
 fonte_terraria = pygame.font.Font("Terraria-Font/ANDYB.TTF",40)
-fonte = pygame.font.Font("fontes/ThaleahFat.ttf", 50) #fonte media
+fonte = pygame.font.Font("fontes/ThaleahFat.ttf", 50) 
 fonte_pequena = pygame.font.Font("fontes/ThaleahFat.ttf",40)
 fonte_nome = pygame.font.Font("fontes/ThaleahFat.ttf",100)
 fonte_outros = pygame.font.Font("fontes/ThaleahFat.ttf",45)
@@ -42,7 +42,7 @@ fundo_desligado = pygame.image.load("imagens/tela_pico8_desligado.png")
 fundo_desligado = pygame.transform.scale(fundo_desligado, (largura_janela, altura_janela))
 
 
-#sons
+#sons de efeito
 menu_selection = pygame.mixer.Sound('audios/menu_selection.wav')
 cursor_select = pygame.mixer.Sound("audios/cursor_select.wav")
 cursor_back = pygame.mixer.Sound("audios/cursor_back.wav")
@@ -67,10 +67,7 @@ laser = pygame.image.load("imagens/blasterbolt.png").convert_alpha()
 laser_rect = laser.get_rect()
 
 
-
 clock = pygame.time.Clock()
-
-
 
 
 
@@ -97,7 +94,7 @@ class Inimigo():
             # pass
         if self.img_rect.x > parede_direita:
             self.vel_inimigo = -self.velocidade
-            self.img_rect.y +=10
+            self.img_rect.y +=5
 
         self.img_rect.x += self.vel_inimigo
 
@@ -252,7 +249,7 @@ def menu():
     
 
     # Defina o volume (opcional)
-    pygame.mixer.music.set_volume(0.1)  # Valor varia de 0.0 a 1.0
+    pygame.mixer.music.set_volume(1.0)  # Valor varia de 0.0 a 1.0
     
     pygame.mixer.music.play(-1)
 
@@ -408,9 +405,8 @@ def tchau():
 
     
 
-
-
 def final():
+    #instanciando um objeto player
     jogador = Player(632,591)
     jogador.laser_list = []
     
@@ -458,7 +454,7 @@ def final():
             janela.blit(texto,texto_rect)
 
 
-       
+        # percorre todos os eventos que ocorrem no jogo
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -478,10 +474,11 @@ def final():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 jogador.atacar()
 
-      
+        #faz com que o jogador se mova
         jogador.move()
 
 
+        #desenha os sprites do boss
         moving_sprites.draw(janela)
         moving_sprites.update(janela,jogador_rect.x - 50)
         
@@ -495,6 +492,8 @@ def final():
         janela.blit(vidas,(parede_esquerda +4,127))
         jogador.updata_life(None)
 
+
+        #atualiza janela
         pygame.display.update()
 
 
@@ -614,7 +613,6 @@ def fase3():
         jogador.updata_life(list_enemys)
 
         pygame.display.update()
-        
         
 
 def fase2():
