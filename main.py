@@ -69,71 +69,70 @@ laser_rect = laser.get_rect()
 clock = pygame.time.Clock()
 
 class Boss(pygame.sprite.Sprite):
-    def __init__(self,pos_x,pos_y,life):
+    def __init__(self, pos_x, pos_y, life):
+        # Inicialização da classe Boss, que herda de pygame.sprite.Sprite
         super().__init__()
-        self.sprites = []
-        self.sprites.append(pygame.image.load("frames_output/frame_000.png").convert_alpha())
-        self.sprites.append(pygame.image.load("frames_output/frame_001.png").convert_alpha())
-        self.sprites.append(pygame.image.load("frames_output/frame_002.png").convert_alpha())
-        self.sprites.append(pygame.image.load("frames_output/frame_003.png").convert_alpha())
+
+        # Lista de sprites para animação do chefe
+        self.sprites = [
+            pygame.image.load("frames_output/frame_000.png").convert_alpha(),
+            pygame.image.load("frames_output/frame_001.png").convert_alpha(),
+            pygame.image.load("frames_output/frame_002.png").convert_alpha(),
+            pygame.image.load("frames_output/frame_003.png").convert_alpha()
+        ]
+        
+        # Índice do sprite atual da animação
         self.image_atual = 0
-        self.image= self.sprites[self.image_atual]
-        self.life = life
-        self.bullet = pygame.image.load("boss_bullet.png").convert_alpha()
-        self.lista_bullet = []
+        self.image = self.sprites[self.image_atual]  # Imagem atual do chefe
+        self.life = life  # Vida do chefe
+        self.bullet = pygame.image.load("boss_bullet.png").convert_alpha()  # Imagem do projétil do chefe
+        self.lista_bullet = []  # Lista de projéteis disparados pelo chefe
         
-        self.rect = self.image.get_rect(center = (pos_x,pos_y))
+        # Definição da posição do chefe e seu retângulo de colisão
+        self.rect = self.image.get_rect(center=(pos_x, pos_y))
         
-
+        # Opacidade para efeitos visuais
         self.opacidade = 0
-        
 
-    def update(self,janela,x):
-        self.image_atual+=0.14
+    def update(self, janela, x):
+        # Método para atualizar a animação do chefe e movimentar seus projéteis
+        self.image_atual += 0.14
         
         if self.image_atual >= len(self.sprites):
             self.image_atual = 0
 
         self.image = self.sprites[int(self.image_atual)]
-        self.imge = pygame.transform.scale(self.image,(64,64))
-       
+        self.imge = pygame.transform.scale(self.image, (64, 64))
         
-        self.opacidade+=0.4
-        # print(self.opacidade)
-        print(self.life)
+        self.opacidade += 0.4
 
+        # Movimentação dos projéteis e remoção daqueles que saíram da tela
         for bala in self.lista_bullet:
             bala.y += 10
             
-
-
             if bala.y > 600:
                 self.lista_bullet.remove(bala)
-            janela.blit(self.bullet,bala)
-
-        
-
+            janela.blit(self.bullet, bala)
 
     def ai(self):
+        # Método que controla a inteligência artificial do chefe, como a variação de opacidade
         imagem_opaca = self.image.copy()
         if self.opacidade >= 220:
             self.opacidade = 220
         imagem_opaca.fill((255, 255, 255, self.opacidade), None, pygame.BLEND_RGBA_MULT)
         self.image = imagem_opaca
 
-    def atack(self,x):
-        if (x+65) >= 810:
-            self.rect.x = x -70
-            bullet = self.bullet.get_rect(center=(self.rect.x + 150 ,self.rect.y))
-        elif (x+65) <= 400:
+    def atack(self, x):
+        # Método para o chefe disparar projéteis em direção ao jogador
+        if (x + 65) >= 810:
+            self.rect.x = x - 70
+            bullet = self.bullet.get_rect(center=(self.rect.x + 150, self.rect.y))
+        elif (x + 65) <= 400:
             self.rect.x = x + 70
-            bullet = self.bullet.get_rect(center=(self.rect.x + 20,self.rect.y))
-            
-
+            bullet = self.bullet.get_rect(center=(self.rect.x + 20, self.rect.y))
         else:
             self.rect.x = x
-        
-            bullet = self.bullet.get_rect(center=(self.rect.x + 100,self.rect.y))
+            bullet = self.bullet.get_rect(center=(self.rect.x + 100, self.rect.y))
 
         self.lista_bullet.append(bullet)
 
@@ -172,99 +171,85 @@ class Inimigo():
             
 
 class Player():
-    def __init__(self,x,y,life=4):
+    def __init__(self, x, y, life=4):
+        # Inicialização do jogador com posição, vida e velocidade padrão
         self.x = x
         self.y = y
         self.velocidade = 5
-        self.laser_list = []
-        self.life = life
-        
-        self.player_rect = player.get_rect(center = (self.x,self.y))
+        self.laser_list = []  # Lista de tiros do jogador
+        self.life = life  # Vida do jogador
+        # Retângulo representando a posição e tamanho do jogador na tela
+        self.player_rect = player.get_rect(center=(self.x, self.y))
+    
     def atacar(self):
-        # print(len(self.laser_list))
-        laser_rect = laser.get_rect(center=(self.player_rect.x+34,self.player_rect.y))
+        # Método para o jogador atirar
+        laser_rect = laser.get_rect(center=(self.player_rect.x + 34, self.player_rect.y))
         if len(self.laser_list) > 1:
             pass
         else:
-        
-            self.laser_list.append(laser_rect)
-        
-            fire.play()
+            self.laser_list.append(laser_rect)  # Adiciona um novo tiro à lista
+            fire.play()  # Reproduz o som de tiro
 
-    def updata_life(self,lista_enemys=None):
-        for i in range(1,self.life+1):
-            janela.blit(vidas,(parede_esquerda + i*40 + 50,130))
+    def update_life(self, lista_enemys=None):
+        # Método para atualizar a vida do jogador e exibir na tela
+        for i in range(1, self.life + 1):
+            janela.blit(vidas, (parede_esquerda + i * 40 + 50, 130))
 
-            if lista_enemys != None:
-            
+            if lista_enemys is not None:
+                # Verifica se o jogador colidiu com algum inimigo e reduz a vida
                 for enemy in lista_enemys:
                     if enemy.img_rect.colliderect(self.player_rect):
                         self.life -= 1
-            
 
     def move(self):
-        # Movimento da nave principal
+        # Método para mover o jogador na tela de acordo com as teclas pressionadas
         teclas = pygame.key.get_pressed()
-        dx= 0
+        dx = 0
         if (teclas[pygame.K_LEFT] or teclas[pygame.K_a]) and self.player_rect.x > parede_esquerda:
             dx = -self.velocidade
-        if (teclas[pygame.K_RIGHT] or teclas[pygame.K_d] ) and self.player_rect.x < parede_direita:
+        if (teclas[pygame.K_RIGHT] or teclas[pygame.K_d]) and self.player_rect.x < parede_direita:
             dx = self.velocidade
-        
-        self.player_rect.x+=dx
+        self.player_rect.x += dx
 
     def draw(self):
-            
+        # Método para desenhar os tiros do jogador na tela
         for rect in self.laser_list:
             rect.y -= 10
-
             if rect.y < 100:
-                self.laser_list.remove(rect)
-            
-        
-            janela.blit(laser,rect)
+                self.laser_list.remove(rect)  # Remove tiros que saíram da tela
+            janela.blit(laser, rect)  # Desenha os tiros na tela
 
-    def colidir(self,lista_enemys=False,boss=None):
+    def colidir(self, lista_enemys=False, boss=None):
+        # Método para verificar colisões do jogador com inimigos ou com o chefe
         if lista_enemys == False:
-           
-
+            # Verifica colisões com o chefe e seus projéteis
             for rect in self.laser_list:
-            # se boss colidir com laser
                 if (boss.rect.colliderect(rect) and boss.opacidade > 180):
-                    boss.life-= 1
+                    boss.life -= 1
                     self.laser_list.remove(rect)
                     esplosao.play()
 
                 for bullet in boss.lista_bullet:
-                    
-                    
                     if bullet.colliderect(rect):
-                        # self.laser_list.remove(rect)
                         boss.lista_bullet.remove(bullet)
-                        
-                    
 
-               
             for bullet in boss.lista_bullet:
                 if self.player_rect.colliderect(bullet):
                     boss.lista_bullet.remove(bullet)
                     self.life -= 1
-                        
 
         else:
+            # Verifica colisões com os inimigos e remove-os da lista se a vida chegar a 0
             for rect in self.laser_list:
                 for enemy in lista_enemys:
                     if enemy.img_rect.colliderect(rect):
-                        enemy.life -=1
-                       
-                        
-                        if enemy.life <=0:
+                        enemy.life -= 1
+                        if enemy.life <= 0:
                             lista_enemys.remove(enemy)
                         self.laser_list.remove(rect)
                         esplosao.play()
                         return True
 
-        
 
 def off():
     while True:
@@ -278,35 +263,38 @@ def off():
 
             if event.type == pygame.KEYDOWN:
                 
-                transicao(menu,"ligando")
+                mudanca(menu,"ligando")
 
         pygame.display.update()
 
 
 
-def transicao(fase,texto):
-    
-    
+def mudanca(fase, texto):
+    # Loop principal para exibir a mudança de fase
     while True:
-        janela.fill((0,0,0))
-        janela.blit(fundo,(0,0))
+        # Preenche a janela com uma cor sólida
+        janela.fill((0, 0, 0))
+        # Exibe o fundo
+        janela.blit(fundo, (0, 0))
 
+        # Verifica os eventos do pygame
         for event in pygame.event.get():
+            # Se o evento for de fechar a janela, encerra o jogo
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
-        
+        # Renderiza o texto na tela
+        texto_renderizado = fonte.render(texto, True, (255, 255, 255))
+        texto_rect = texto_renderizado.get_rect(center=(largura_janela / 2, altura_janela / 2))
+        janela.blit(texto_renderizado, texto_rect)
 
-        texto = fonte.render(texto,True,(255,255,255))
-        texto_rect = texto.get_rect(center=(largura_janela/2,altura_janela/2))
-        janela.blit(texto,texto_rect)
-        
-        
-
+        # Atualiza a janela
         pygame.display.update()
+        
+        # Aguarda 2 segundos antes de chamar a próxima fase
         pygame.time.wait(2000)
-        fase()
+        fase()  # Chama a próxima fase após o tempo de espera
 
 
 
@@ -322,10 +310,10 @@ def menu():
     pygame.mixer.music.play(-1)
 
 
-    opcoes = [0,1,2]
+    opcoes = 3
     indice = 0
     azul = (0,0,255)
-    preto = (255,255,255)
+    branco = (255,255,255)
    
     while True:
         
@@ -345,7 +333,7 @@ def menu():
                 menu_selection.play()
                 indice-=1
                 if indice <0:
-                    indice = len(opcoes)-1
+                    indice = opcoes
             
 
 
@@ -357,7 +345,7 @@ def menu():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE and indice == 0:
                     pygame.mixer.music.stop()
-                    transicao(fase1,"Fase 1")
+                    mudanca(fase1,"Fase 1")
                     
                 if event.key == pygame.K_SPACE and indice == 2:
                     cursor_select.play()
@@ -366,19 +354,19 @@ def menu():
                 if event.key == pygame.K_s:
                     menu_selection.play()
                     indice = indice +1
-                    if indice>=len(opcoes):
+                    if indice>=opcoes:
                         indice = 0
                 if event.key == pygame.K_w:
                     menu_selection.play()
                     indice = indice - 1
                     if indice <0:
-                        indice = len(opcoes)-1
+                        indice = opcoes-1
 
-        start = fonte.render("Start",True,preto)
-        config = fonte.render("conquistas",True,preto)
-        sair = fonte.render("Sair",True,preto)
+        start = fonte.render("Start",True,branco)
+        config = fonte.render("conquistas",True,branco)
+        sair = fonte.render("Sair",True,branco)
 
-        nome = fonte_nome.render("Game OOP",True,preto)
+        nome = fonte_nome.render("Game OOP",True,branco)
         nome_rect = nome.get_rect(center=(largura_janela/2,altura_janela/2 - 200))
         janela.blit(nome,nome_rect)
 
@@ -411,7 +399,7 @@ def tchau():
     opcoes = [0,1]
     indice = 0
     azul = (0,0,255)
-    preto = (255,255,255)
+    branco = (255,255,255)
     while True:
         janela.fill((255,255,255))
         janela.blit(fundo,(0,0))
@@ -442,11 +430,11 @@ def tchau():
                     if indice <0:
                         indice = len(opcoes)-1
 
-        sim = fonte.render("Sim",True,preto)
-        nao = fonte.render("Nao",True,preto)
+        sim = fonte.render("Sim",True,branco)
+        nao = fonte.render("Nao",True,branco)
         
 
-        nome = fonte_outros.render("Tem certeza que quer sair?",True,preto)
+        nome = fonte_outros.render("Tem certeza que quer sair?",True,branco)
         nome_rect = nome.get_rect(center=(largura_janela/2,altura_janela/2 - 100))
         janela.blit(nome,nome_rect)
 
@@ -558,7 +546,7 @@ def final():
         
         vidas = fonte_pequena.render("Life:",True,(255,255,255))
         janela.blit(vidas,(parede_esquerda +4,127))
-        jogador.updata_life(None)
+        jogador.update_life(None)
 
 
         #atualiza janela
@@ -607,8 +595,8 @@ def fase4():
             enemy.move()
 
         if len(list_enemys) == 0:
-            transicao(final,"BOSS FINAL !")
-            # transicao(fase2,"Fase 2")
+            mudanca(final,"BOSS FINAL !")
+            # mudanca(fase2,"Fase 2")
 
 
         score = fonte_pequena.render(f"Score: {pontos}",True,(255,255,255))
@@ -619,7 +607,7 @@ def fase4():
         janela.blit(player,jogador_rect)
         janela.blit(score,(parede_esquerda +4,90))
         janela.blit(vidas,(parede_esquerda +4,127))
-        jogador.updata_life(list_enemys)
+        jogador.update_life(list_enemys)
 
         pygame.display.update()
 
@@ -666,8 +654,8 @@ def fase3():
             enemy.move()
 
         if len(list_enemys) == 0:
-            # transicao(final,"BOSS FINAL !")
-            transicao(fase4,"Fase 4")
+            
+            mudanca(fase4,"Fase 4")
 
 
         score = fonte_pequena.render(f"Score: {pontos}",True,(255,255,255))
@@ -678,7 +666,7 @@ def fase3():
         janela.blit(player,jogador_rect)
         janela.blit(score,(parede_esquerda +4,90))
         janela.blit(vidas,(parede_esquerda +4,127))
-        jogador.updata_life(list_enemys)
+        jogador.update_life(list_enemys)
 
         pygame.display.update()
         
@@ -688,8 +676,9 @@ def fase2():
     enemy = Inimigo("imagens/alien.png",490,200,5,3)
     enemy2 = Inimigo("imagens/alien.png",600,250,5,3)
     enemy3 = Inimigo("imagens/alien.png",390,300,5,3)
+    enemy4 = Inimigo("imagens/alien.png",parede_esquerda+40,140,10,10)
 
-    list_enemys = [enemy,enemy2,enemy3]
+    list_enemys = [enemy,enemy2,enemy3,enemy4]
     
     pontos = 0
     while True:
@@ -725,8 +714,8 @@ def fase2():
             enemy.move()
 
         if len(list_enemys) == 0:
-            # transicao(final,"BOSS FINAL !")
-            transicao(fase3,"Fase 3")
+            
+            mudanca(fase3,"Fase 3")
 
 
         score = fonte_pequena.render(f"Score: {pontos}",True,(255,255,255))
@@ -737,7 +726,7 @@ def fase2():
         janela.blit(player,jogador_rect)
         janela.blit(score,(parede_esquerda +4,90))
         janela.blit(vidas,(parede_esquerda +4,127))
-        jogador.updata_life(list_enemys)
+        jogador.update_life(list_enemys)
 
         pygame.display.update()
 
@@ -784,8 +773,8 @@ def fase1():
             enemy.move()
 
         if len(list_enemys) == 0:
-            # transicao(final,"BOSS FINAL !")
-            transicao(fase2,"Fase 2")
+         
+            mudanca(fase2,"Fase 2")
 
 
         score = fonte_pequena.render(f"Score: {pontos}",True,(255,255,255))
@@ -796,7 +785,7 @@ def fase1():
         janela.blit(player,jogador_rect)
         janela.blit(score,(parede_esquerda +4,90))
         janela.blit(vidas,(parede_esquerda +4,127))
-        jogador.updata_life(list_enemys)
+        jogador.update_life(list_enemys)
 
         pygame.display.update()
 
