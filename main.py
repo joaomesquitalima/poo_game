@@ -88,8 +88,7 @@ class Inimigo():
         pass
 
     def move(self):
-        #movimento alien
-        
+
         
         if self.img_rect.x < parede_esquerda:
             self.vel_inimigo = self.velocidade
@@ -191,7 +190,11 @@ class Player():
             for rect in self.laser_list:
                 for enemy in lista_enemys:
                     if enemy.img_rect.colliderect(rect):
-                        lista_enemys.remove(enemy)
+                        enemy.life -=1
+                       
+                        
+                        if enemy.life <=0:
+                            lista_enemys.remove(enemy)
                         self.laser_list.remove(rect)
                         esplosao.play()
                         return True
@@ -505,17 +508,17 @@ def fase1():
 
     
     jogador = Player(632,591)
-    enemy = Inimigo("imagens/alien.png",490,200,1,3)
-    enemy2 = Inimigo("imagens/alien.png",600,250,1,3)
-    enemy3 = Inimigo("imagens/alien.png",390,300,1,3)
+    enemy = Inimigo("imagens/alien.png",490,200,5,3)
+    enemy2 = Inimigo("imagens/alien.png",600,250,5,3)
+    enemy3 = Inimigo("imagens/alien.png",390,300,5,3)
 
-    enemy4 = Inimigo("imagens/alien.png",490,200,1,3)
-    enemy5 = Inimigo("imagens/alien.png",600,250,1,3)
-    enemy6 = Inimigo("imagens/alien.png",390,300,1,3)
+    enemy4 = Inimigo("imagens/alien.png",490,200,5,3)
+    enemy5 = Inimigo("imagens/alien.png",600,250,5,3)
+    enemy6 = Inimigo("imagens/alien.png",390,300,5,3)
 
-    enemy7 = Inimigo("imagens/alien.png",490,200,1,3)
-    enemy8 = Inimigo("imagens/alien.png",600,250,1,3)
-    enemy9 = Inimigo("imagens/alien.png",390,300,1,3)
+    enemy7 = Inimigo("imagens/alien.png",490,200,5,3)
+    enemy8 = Inimigo("imagens/alien.png",600,250,5,3)
+    enemy9 = Inimigo("imagens/alien.png",390,300,5,3)
 
     list_enemys = [enemy,enemy2,enemy3]
 
