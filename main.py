@@ -1,5 +1,5 @@
 import pygame,sys
-import time
+import abc
 
 
 pygame.init()
@@ -419,7 +419,7 @@ def menu(pontos):
                     
                 if event.key == pygame.K_SPACE and indice == 2:
                     cursor_select.play()
-                    tchau()
+                    tchau(pontos)
 
                 if event.key == pygame.K_s:
                     menu_selection.play()
@@ -529,7 +529,27 @@ def tchau(pontos):
 
         pygame.display.update()
 
-    
+def fim():
+    while True:
+        janela.fill((255,255,255))
+        janela.blit(fundo,(0,0))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.KEYDOWN:
+                
+                # mudanca(menu,"GAMER OVER",0)
+                menu(0)
+
+        start = fonte.render("FIM...",True,(255,255,255))
+        start_rect = start.get_rect(center=(largura_janela/2,altura_janela/2))
+
+        janela.blit(start,start_rect)
+
+        pygame.display.update()
 
 def final(pontos):
     #instanciando um objeto player
@@ -605,11 +625,13 @@ def final(pontos):
         #faz com que o jogador se mova
         jogador.move()
         
-        if boss.life <150:
+        if boss.life <150 and boss.life >0:
             boss.atack(jogador_rect.x - 65,1000)
             print("Parte 2")
-        else:
+        elif boss.life >=150:
             boss.atack(jogador_rect.x - 65,2000)
+        elif boss.life <=0:
+            fim()
 
 
         #desenha os sprites do boss
