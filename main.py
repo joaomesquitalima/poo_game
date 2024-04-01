@@ -99,6 +99,8 @@ class Boss(pygame.sprite.Sprite):
         # Opacidade para efeitos visuais
         self.opacidade = 0
 
+        self.last_attack_time = pygame.time.get_ticks() 
+
     def update(self, janela, x):
         # Método para atualizar a animação do chefe e movimentar seus projéteis
         self.image_atual += 0.14
@@ -127,19 +129,25 @@ class Boss(pygame.sprite.Sprite):
         imagem_opaca.fill((255, 255, 255, self.opacidade), None, pygame.BLEND_RGBA_MULT)
         self.image = imagem_opaca
 
-    def atack(self, x):
+    def atack(self, x,time_atack):
         # Método para o chefe disparar projéteis em direção ao jogador
-        if (x + 65) >= 810:
-            self.rect.x = x - 70
-            bullet = self.bullet.get_rect(center=(self.rect.x + 150, self.rect.y))
-        elif (x + 65) <= 400:
-            self.rect.x = x + 70
-            bullet = self.bullet.get_rect(center=(self.rect.x + 20, self.rect.y))
-        else:
-            self.rect.x = x
-            bullet = self.bullet.get_rect(center=(self.rect.x + 100, self.rect.y))
+        current_time = pygame.time.get_ticks()
+        if current_time - self.last_attack_time >= time_atack:
+            # Executar ataque somente se passou tempo suficiente desde o último ataque
+            self.last_attack_time = current_time  # Atualiza o tempo do último ataque
+                
+            
+            if (x + 65) >= 810:
+                self.rect.x = x - 70
+                bullet = self.bullet.get_rect(center=(self.rect.x + 150, self.rect.y))
+            elif (x + 65) <= 400:
+                self.rect.x = x + 70
+                bullet = self.bullet.get_rect(center=(self.rect.x + 20, self.rect.y))
+            else:
+                self.rect.x = x
+                bullet = self.bullet.get_rect(center=(self.rect.x + 100, self.rect.y))
 
-        self.lista_bullet.append(bullet)
+            self.lista_bullet.append(bullet)
 
 #interface enemy pra criar inimigos
 class Enemy():
@@ -272,17 +280,15 @@ class Player():
 
         else:
             # Verifica colisões com os inimigos e remove-os da lista se a vida chegar a 0
-            for rect in self.laser_list:
-                for enemy in lista_enemys:
+            for rect in self.laser_list[:]:  # Itera sobre uma cópia da lista laser_list
+                for enemy in lista_enemys[:]:  # Itera sobre uma cópia da lista lista_enemys
                     if enemy.img_rect.colliderect(rect):
                         enemy.life -= 1
-                        
-                        self.laser_list.remove(rect)
                         esplosao.play()
+                        self.laser_list.remove(rect)  # Remove o projétil da lista original
                         if enemy.life <= 0:
-                            lista_enemys.remove(enemy)
-                            return True
-                        
+                            lista_enemys.remove(enemy)  
+                            
 
 
 def off():
@@ -511,28 +517,30 @@ def final(pontos):
 
 
     moving_sprites = pygame.sprite.Group()
-    boss = Boss(largura_janela/2,altura_janela/2 - 100,100)
+    boss = Boss(largura_janela/2,altura_janela/2 - 100,200)
     moving_sprites.add(boss)
 
     # Defina um evento personalizado
     inicio_ataque= pygame.USEREVENT + 1
 
-    padrao1 = pygame.USEREVENT + 2
+    # padrao1 = pygame.USEREVENT + 2
 
     pygame.time.set_timer(inicio_ataque, 5 * 1000)
 
-    pygame.time.set_timer(padrao1, 500)
+    # pygame.time.set_timer(padrao1, 2000)
 
     ataque = False
 
     texto =  fonte_terraria.render("Cérebro de Cthulhu nasceu",True,(255,255,255))
     texto_rect = texto.get_rect(center = (largura_janela/2,altura_janela/2))
-
+    parte2 = False
     while True:
         clock.tick(60)
         janela.fill((255,255,255))
         janela.blit(fundo,(0,0))
         boss.ai()
+
+        
 
         jogador_rect = jogador.player_rect
         jogador.draw()
@@ -553,8 +561,8 @@ def final(pontos):
             if event.type == inicio_ataque:
                 ataque = True
 
-            if ataque and event.type == padrao1:
-                boss.atack(jogador_rect.x - 65)
+            # if ataque and event.type == padrao1:
+            #     boss.atack(jogador_rect.x - 65)
                 
 
             if event.type == pygame.KEYDOWN:
@@ -566,6 +574,12 @@ def final(pontos):
 
         #faz com que o jogador se mova
         jogador.move()
+        
+        if boss.life <150:
+            boss.atack(jogador_rect.x - 65,1000)
+            print("Parte 2")
+        else:
+            boss.atack(jogador_rect.x - 65,2000)
 
 
         #desenha os sprites do boss
