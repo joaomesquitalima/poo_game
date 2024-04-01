@@ -626,6 +626,9 @@ def final(pontos):
         janela.blit(vidas,(parede_esquerda +4,127))
         jogador.update_life(None)
 
+        if jogador.life <=0:
+            game_over()
+
 
         #atualiza janela
         pygame.display.update()
@@ -694,6 +697,9 @@ def fase4(pontos):
         janela.blit(score,(parede_esquerda +4,90))
         janela.blit(vidas,(parede_esquerda +4,127))
         jogador.update_life(list_enemys)
+
+        if jogador.life <=0:
+            game_over()
 
         pygame.display.update()
 
@@ -764,6 +770,9 @@ def fase3(pontos):
         janela.blit(vidas,(parede_esquerda +4,127))
         jogador.update_life(list_enemys)
 
+        if jogador.life <=0:
+            game_over()
+
         pygame.display.update()
         
 
@@ -831,6 +840,9 @@ def fase2(pontos):
         janela.blit(score,(parede_esquerda +4,90))
         janela.blit(vidas,(parede_esquerda +4,127))
         jogador.update_life(list_enemys)
+
+        if jogador.life <=0:
+            game_over()
 
         pygame.display.update()
 
