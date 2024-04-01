@@ -224,11 +224,10 @@ class Player():
     def atacar(self):
         # Método para o jogador atirar
         laser_rect = laser.get_rect(center=(self.player_rect.x + 34, self.player_rect.y))
-        if len(self.laser_list) > 1:
-            pass
-        else:
-            self.laser_list.append(laser_rect)  # Adiciona um novo tiro à lista
-            fire.play()  # Reproduz o som de tiro
+        
+        
+        self.laser_list.append(laser_rect)  # Adiciona um novo tiro à lista
+        fire.play()  # Reproduz o som de tiro
 
     def update_life(self, lista_enemys=None):
         # Método para atualizar a vida do jogador e exibir na tela
@@ -240,6 +239,12 @@ class Player():
                 for enemy in lista_enemys:
                     if enemy.img_rect.colliderect(self.player_rect):
                         self.life -= 1
+                    for laser in enemy.lasers_list:
+                        if laser.colliderect(self.player_rect):
+                            enemy.lasers_list.remove(laser)
+                            self.life -= 1
+
+
 
     def move(self):
         # Método para mover o jogador na tela de acordo com as teclas pressionadas
@@ -287,7 +292,8 @@ class Player():
                         esplosao.play()
                         self.laser_list.remove(rect)  # Remove o projétil da lista original
                         if enemy.life <= 0:
-                            lista_enemys.remove(enemy)  
+                            lista_enemys.remove(enemy) 
+                            return True 
                             
 
 
@@ -336,6 +342,30 @@ def mudanca(fase, texto,pontos):
         pygame.time.wait(2000)
         fase(pontos)  # Chama a próxima fase após o tempo de espera
 
+
+
+
+def game_over():
+    while True:
+        janela.fill((255,255,255))
+        janela.blit(fundo,(0,0))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.KEYDOWN:
+                
+                # mudanca(menu,"GAMER OVER",0)
+                menu(0)
+
+        start = fonte.render("Gamer Over",True,(255,255,255))
+        start_rect = start.get_rect(center=(largura_janela/2,altura_janela/2))
+
+        janela.blit(start,start_rect)
+
+        pygame.display.update()
 
 
 def menu(pontos):
@@ -434,7 +464,7 @@ def menu(pontos):
 
 
 
-def tchau():
+def tchau(pontos):
     
     opcoes = [0,1]
     indice = 0
@@ -452,7 +482,7 @@ def tchau():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE and indice == 1:
                     cursor_back.play()
-                    menu()
+                    menu(pontos)
                 if event.key == pygame.K_SPACE and indice == 0:
                     cursor_select.play()
                     time.sleep(1)
@@ -523,11 +553,11 @@ def final(pontos):
     # Defina um evento personalizado
     inicio_ataque= pygame.USEREVENT + 1
 
-    # padrao1 = pygame.USEREVENT + 2
+
 
     pygame.time.set_timer(inicio_ataque, 5 * 1000)
 
-    # pygame.time.set_timer(padrao1, 2000)
+   
 
     ataque = False
 
@@ -871,6 +901,9 @@ def fase1(pontos):
         janela.blit(score,(parede_esquerda +4,90))
         janela.blit(vidas,(parede_esquerda +4,127))
         jogador.update_life(list_enemys)
+
+        if jogador.life <=0:
+            game_over()
 
         pygame.display.update()
 
