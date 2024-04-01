@@ -136,10 +136,8 @@ class Boss(pygame.sprite.Sprite):
 
         self.lista_bullet.append(bullet)
 
-        
 
-
-class Inimigo():
+class Enemy():
     def __init__(self,img,x,y,life,velocidade):
         self.x = x
         self.y = y
@@ -148,22 +146,33 @@ class Inimigo():
         self.img = pygame.image.load(img).convert_alpha()
         self.img = pygame.transform.scale(self.img,(64,64))
         self.img_rect = self.img.get_rect(center=(x,y))
-        self.vel_inimigo = self.velocidade
+        self.vel_enemy = self.velocidade
+    def atack(self):
+        pass
+    def move(self):
+        pass
+        
+
+class Alien(Enemy):
+    def __init__(self,img, x, y,life,velocidade):
+        # Chama o construtor da classe pai para inicializar atributos comuns
+        super().__init__(img, x, y, life, velocidade)
+        
     def atack(self):
         pass
 
     def move(self):
       
         if self.img_rect.x < parede_esquerda:
-            self.vel_inimigo = self.velocidade
+            self.vel_enemy = self.velocidade
             self.img_rect.y +=10
             
             # pass
         if self.img_rect.x > parede_direita:
-            self.vel_inimigo = -self.velocidade
+            self.vel_enemy = -self.velocidade
             self.img_rect.y +=5
 
-        self.img_rect.x += self.vel_inimigo
+        self.img_rect.x += self.vel_enemy
 
         janela.blit(self.img,self.img_rect)
 
@@ -555,9 +564,9 @@ def final():
 
 def fase4():
     jogador = Player(632,591)
-    enemy = Inimigo("imagens/alien.png",parede_esquerda+20,200,5,3)
-    enemy2 = Inimigo("imagens/alien.png",parede_direita-20,250,5,3)
-    enemy3 = Inimigo("imagens/alien.png",490,300,5,3)
+    enemy = Alien("imagens/alien.png",parede_esquerda+20,200,5,3)
+    enemy2 = Alien("imagens/alien.png",parede_direita-20,250,5,3)
+    enemy3 = Alien("imagens/alien.png",490,300,5,3)
 
     list_enemys = [enemy,enemy2,enemy3]
     
@@ -614,11 +623,13 @@ def fase4():
 
 def fase3():
     jogador = Player(632,591)
-    enemy = Inimigo("imagens/alien.png",490,200,5,3)
-    enemy2 = Inimigo("imagens/alien.png",600,250,5,3)
-    enemy3 = Inimigo("imagens/alien.png",390,300,5,3)
+    enemy = Alien("imagens/alien.png",490,200,5,3)
+    enemy2 = Alien("imagens/alien.png",600,250,5,3)
+    enemy3 = Alien("imagens/alien.png",390,300,5,3)
+    enemy4 = Alien("imagens/alien.png",490,310,5,3)
+    enemy5 = Alien("imagens/alien.png",parede_esquerda+50,380,5,3)
 
-    list_enemys = [enemy,enemy2,enemy3]
+    list_enemys = [enemy,enemy2,enemy3,enemy4,enemy5]
     
     pontos = 0
     while True:
@@ -673,10 +684,10 @@ def fase3():
 
 def fase2():
     jogador = Player(632,591)
-    enemy = Inimigo("imagens/alien.png",490,200,5,3)
-    enemy2 = Inimigo("imagens/alien.png",600,250,5,3)
-    enemy3 = Inimigo("imagens/alien.png",390,300,5,3)
-    enemy4 = Inimigo("imagens/alien.png",parede_esquerda+40,140,10,10)
+    enemy = Alien("imagens/alien.png",490,200,5,3)
+    enemy2 = Alien("imagens/alien.png",600,250,5,3)
+    enemy3 = Alien("imagens/alien.png",390,300,5,3)
+    enemy4 = Alien("red_alien.png",parede_esquerda+40,140,10,7)
 
     list_enemys = [enemy,enemy2,enemy3,enemy4]
     
@@ -733,9 +744,9 @@ def fase2():
 def fase1():
     
     jogador = Player(632,591)
-    enemy = Inimigo("imagens/alien.png",490,200,5,3)
-    enemy2 = Inimigo("imagens/alien.png",600,250,5,3)
-    enemy3 = Inimigo("imagens/alien.png",390,300,5,3)
+    enemy = Alien("imagens/alien.png",490,200,5,3)
+    enemy2 = Alien("imagens/alien.png",600,250,5,3)
+    enemy3 = Alien("imagens/alien.png",390,300,5,3)
 
     list_enemys = [enemy,enemy2,enemy3]
     
