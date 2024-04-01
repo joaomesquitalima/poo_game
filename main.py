@@ -26,7 +26,7 @@ janela = pygame.display.set_mode((largura_janela,altura_janela))
 
 
 #fontes de texto
-fonte_terraria = pygame.font.Font("Terraria-Font/ANDYB.TTF",40)
+fonte_terraria = pygame.font.Font("fontes/ANDYB.TTF",40)
 fonte = pygame.font.Font("fontes/ThaleahFat.ttf", 50) 
 fonte_pequena = pygame.font.Font("fontes/ThaleahFat.ttf",40)
 fonte_nome = pygame.font.Font("fontes/ThaleahFat.ttf",100)
@@ -85,7 +85,7 @@ class Boss(pygame.sprite.Sprite):
         self.image_atual = 0
         self.image = self.sprites[self.image_atual]  # Imagem atual do chefe
         self.life = life  # Vida do chefe
-        self.bullet = pygame.image.load("boss_bullet.png").convert_alpha()  # Imagem do projétil do chefe
+        self.bullet = pygame.image.load("imagens/boss_bullet.png").convert_alpha()  # Imagem do projétil do chefe
         self.lista_bullet = []  # Lista de projéteis disparados pelo chefe
         
         # Definição da posição do chefe e seu retângulo de colisão
@@ -136,7 +136,7 @@ class Boss(pygame.sprite.Sprite):
 
         self.lista_bullet.append(bullet)
 
-
+#interface enemy pra criar inimigos
 class Enemy():
     def __init__(self,img,x,y,life,velocidade):
         self.x = x
@@ -255,9 +255,10 @@ class Player():
                         enemy.life -= 1
                         if enemy.life <= 0:
                             lista_enemys.remove(enemy)
+                            return True
                         self.laser_list.remove(rect)
                         esplosao.play()
-                        return True
+                        
 
 
 def off():
@@ -272,13 +273,13 @@ def off():
 
             if event.type == pygame.KEYDOWN:
                 
-                mudanca(menu,"ligando")
+                mudanca(menu,"ligando",0)
 
         pygame.display.update()
 
 
 
-def mudanca(fase, texto):
+def mudanca(fase, texto,pontos):
     # Loop principal para exibir a mudança de fase
     while True:
         # Preenche a janela com uma cor sólida
@@ -303,11 +304,11 @@ def mudanca(fase, texto):
         
         # Aguarda 2 segundos antes de chamar a próxima fase
         pygame.time.wait(2000)
-        fase()  # Chama a próxima fase após o tempo de espera
+        fase(pontos)  # Chama a próxima fase após o tempo de espera
 
 
 
-def menu():
+def menu(pontos):
     # Carregue a música
     pygame.mixer.music.load('musica/menu.mp3')
     
@@ -336,7 +337,7 @@ def menu():
             up = controle_ps4.get_button(11)
         
             if botao_x and indice == 0:        
-                fase1()
+                fase1(pontos)
 
             if up:
                 menu_selection.play()
@@ -354,7 +355,7 @@ def menu():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE and indice == 0:
                     pygame.mixer.music.stop()
-                    mudanca(fase1,"Fase 1")
+                    mudanca(fase1,"Fase 1",pontos)
                     
                 if event.key == pygame.K_SPACE and indice == 2:
                     cursor_select.play()
@@ -470,18 +471,18 @@ def tchau():
 
     
 
-def final():
+def final(pontos):
     #instanciando um objeto player
     jogador = Player(632,591)
     jogador.laser_list = []
     
    
-    pygame.mixer.music.load("boss_music.mpeg")
+    pygame.mixer.music.load("audios/boss_music.mpeg")
 
     pygame.mixer.music.play(-1)
     pygame.mixer.music.set_volume(1)
 
-    boss_nascendo = pygame.mixer.Sound("boss_nascendo.mp3")
+    boss_nascendo = pygame.mixer.Sound("audios/boss_nascendo.mp3")
     boss_nascendo.play()
 
 
@@ -562,7 +563,7 @@ def final():
         pygame.display.update()
 
 
-def fase4():
+def fase4(pontos):
     jogador = Player(632,591)
     enemy = Alien("imagens/alien.png",parede_esquerda+20,200,5,3)
     enemy2 = Alien("imagens/alien.png",parede_direita-20,250,5,3)
@@ -570,7 +571,7 @@ def fase4():
 
     list_enemys = [enemy,enemy2,enemy3]
     
-    pontos = 0
+ 
     while True:
         janela.fill((255,255,255))
         janela.blit(fundo,(0,0))
@@ -604,8 +605,8 @@ def fase4():
             enemy.move()
 
         if len(list_enemys) == 0:
-            mudanca(final,"BOSS FINAL !")
-            # mudanca(fase2,"Fase 2")
+            mudanca(final,"BOSS FINAL !",pontos)
+            
 
 
         score = fonte_pequena.render(f"Score: {pontos}",True,(255,255,255))
@@ -621,7 +622,7 @@ def fase4():
         pygame.display.update()
 
 
-def fase3():
+def fase3(pontos):
     jogador = Player(632,591)
     enemy = Alien("imagens/alien.png",490,200,5,3)
     enemy2 = Alien("imagens/alien.png",600,250,5,3)
@@ -631,7 +632,7 @@ def fase3():
 
     list_enemys = [enemy,enemy2,enemy3,enemy4,enemy5]
     
-    pontos = 0
+    
     while True:
         janela.fill((255,255,255))
         janela.blit(fundo,(0,0))
@@ -666,7 +667,7 @@ def fase3():
 
         if len(list_enemys) == 0:
             
-            mudanca(fase4,"Fase 4")
+            mudanca(fase4,"Fase 4",pontos)
 
 
         score = fonte_pequena.render(f"Score: {pontos}",True,(255,255,255))
@@ -682,16 +683,16 @@ def fase3():
         pygame.display.update()
         
 
-def fase2():
+def fase2(pontos):
     jogador = Player(632,591)
     enemy = Alien("imagens/alien.png",490,200,5,3)
     enemy2 = Alien("imagens/alien.png",600,250,5,3)
     enemy3 = Alien("imagens/alien.png",390,300,5,3)
-    enemy4 = Alien("red_alien.png",parede_esquerda+40,140,10,7)
+    enemy4 = Alien("imagens/red_alien.png",parede_esquerda+40,140,10,7)
 
     list_enemys = [enemy,enemy2,enemy3,enemy4]
     
-    pontos = 0
+    
     while True:
         janela.fill((255,255,255))
         janela.blit(fundo,(0,0))
@@ -726,7 +727,7 @@ def fase2():
 
         if len(list_enemys) == 0:
             
-            mudanca(fase3,"Fase 3")
+            mudanca(fase3,"Fase 3",pontos)
 
 
         score = fonte_pequena.render(f"Score: {pontos}",True,(255,255,255))
@@ -741,7 +742,7 @@ def fase2():
 
         pygame.display.update()
 
-def fase1():
+def fase1(pontos):
     
     jogador = Player(632,591)
     enemy = Alien("imagens/alien.png",490,200,5,3)
@@ -750,7 +751,7 @@ def fase1():
 
     list_enemys = [enemy,enemy2,enemy3]
     
-    pontos = 0
+
     while True:
         janela.fill((255,255,255))
         janela.blit(fundo,(0,0))
@@ -785,7 +786,7 @@ def fase1():
 
         if len(list_enemys) == 0:
          
-            mudanca(fase2,"Fase 2")
+            mudanca(fase2,"Fase 2",pontos)
 
 
         score = fonte_pequena.render(f"Score: {pontos}",True,(255,255,255))
