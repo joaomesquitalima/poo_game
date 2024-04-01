@@ -1,6 +1,6 @@
 import pygame,sys
 import time
-import random
+
 
 pygame.init()
 
@@ -46,7 +46,6 @@ menu_selection = pygame.mixer.Sound('audios/menu_selection.wav')
 cursor_select = pygame.mixer.Sound("audios/cursor_select.wav")
 cursor_back = pygame.mixer.Sound("audios/cursor_back.wav")
 mudar = pygame.mixer.Sound("audios/open_001.ogg")
-
 fire = pygame.mixer.Sound("audios/Shoot_01.mp3")
 fire.set_volume(0.7)
 esplosao = pygame.mixer.Sound("audios/explosion.mp3")
@@ -67,6 +66,12 @@ laser_rect = laser.get_rect()
 
 
 clock = pygame.time.Clock()
+
+
+enemy_atack = pygame.USEREVENT + 3
+pygame.time.set_timer(enemy_atack, 1000)
+
+
 
 class Boss(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, life):
@@ -157,11 +162,19 @@ class Alien(Enemy):
     def __init__(self,img, x, y,life,velocidade):
         # Chama o construtor da classe pai para inicializar atributos comuns
         super().__init__(img, x, y, life, velocidade)
+        self.lasers_list = []
+        self.laser = pygame.image.load("alien_laser.png").convert_alpha()
         
     def atack(self):
-        pass
+        bullet = self.laser.get_rect(center=(self.img_rect.x + 40, self.img_rect.y+10))
+        self.lasers_list.append(bullet)
+        
 
     def move(self):
+        for bala in self.lasers_list:
+            bala.y += 10
+
+            janela.blit(self.laser,bala)
       
         if self.img_rect.x < parede_esquerda:
             self.vel_enemy = self.velocidade
@@ -593,6 +606,11 @@ def fase4(pontos):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 jogador.atacar()
 
+            for enemy in list_enemys:
+
+                if event.type == enemy_atack:
+                    enemy.atack()
+
       
         jogador.move()
         jogador.draw()
@@ -654,6 +672,11 @@ def fase3(pontos):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 jogador.atacar()
 
+            for enemy in list_enemys:
+
+                if event.type == enemy_atack:
+                    enemy.atack()
+
       
         jogador.move()
         jogador.draw()
@@ -714,6 +737,11 @@ def fase2(pontos):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 jogador.atacar()
 
+            for enemy in list_enemys:
+
+                if event.type == enemy_atack:
+                    enemy.atack()
+
       
         jogador.move()
         jogador.draw()
@@ -772,6 +800,12 @@ def fase1(pontos):
                     
             if event.type == pygame.MOUSEBUTTONDOWN:
                 jogador.atacar()
+
+            for enemy in list_enemys:
+
+                if event.type == enemy_atack:
+                    enemy.atack()
+
 
       
         jogador.move()
