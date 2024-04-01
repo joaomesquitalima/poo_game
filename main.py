@@ -159,20 +159,30 @@ class Enemy():
         
 
 class Alien(Enemy):
-    def __init__(self,img, x, y,life,velocidade):
+    def __init__(self,img, x, y,life,velocidade,atack_time= 1000):
         # Chama o construtor da classe pai para inicializar atributos comuns
         super().__init__(img, x, y, life, velocidade)
         self.lasers_list = []
         self.laser = pygame.image.load("alien_laser.png").convert_alpha()
+        self.atack_time = atack_time
+        self.last_attack_time = pygame.time.get_ticks() 
         
     def atack(self):
         bullet = self.laser.get_rect(center=(self.img_rect.x + 40, self.img_rect.y+10))
         self.lasers_list.append(bullet)
+
+    
         
 
     def move(self):
+
+        
         for bala in self.lasers_list:
+            
             bala.y += 10
+            if bala.y > altura_janela - 150:
+                self.lasers_list.remove(bala)
+                
 
             janela.blit(self.laser,bala)
       
@@ -266,11 +276,12 @@ class Player():
                 for enemy in lista_enemys:
                     if enemy.img_rect.colliderect(rect):
                         enemy.life -= 1
+                        
+                        self.laser_list.remove(rect)
+                        esplosao.play()
                         if enemy.life <= 0:
                             lista_enemys.remove(enemy)
                             return True
-                        self.laser_list.remove(rect)
-                        esplosao.play()
                         
 
 
@@ -578,9 +589,9 @@ def final(pontos):
 
 def fase4(pontos):
     jogador = Player(632,591)
-    enemy = Alien("imagens/alien.png",parede_esquerda+20,200,5,3)
-    enemy2 = Alien("imagens/alien.png",parede_direita-20,250,5,3)
-    enemy3 = Alien("imagens/alien.png",490,300,5,3)
+    enemy = Alien("imagens/alien.png",parede_esquerda+20,200,5,3,atack_time=1000)
+    enemy2 = Alien("imagens/alien.png",parede_direita-20,250,5,3,atack_time=2000)
+    enemy3 = Alien("imagens/alien.png",490,300,5,3,atack_time=6000)
 
     list_enemys = [enemy,enemy2,enemy3]
     
@@ -606,10 +617,7 @@ def fase4(pontos):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 jogador.atacar()
 
-            for enemy in list_enemys:
-
-                if event.type == enemy_atack:
-                    enemy.atack()
+            
 
       
         jogador.move()
@@ -621,6 +629,12 @@ def fase4(pontos):
         
         for enemy in list_enemys:
             enemy.move()
+            current_time = pygame.time.get_ticks()
+            if current_time - enemy.last_attack_time >= enemy.atack_time:
+                # Executar ataque somente se passou tempo suficiente desde o último ataque
+                enemy.last_attack_time = current_time  # Atualiza o tempo do último ataque
+                
+                enemy.atack()
 
         if len(list_enemys) == 0:
             mudanca(final,"BOSS FINAL !",pontos)
@@ -642,10 +656,10 @@ def fase4(pontos):
 
 def fase3(pontos):
     jogador = Player(632,591)
-    enemy = Alien("imagens/alien.png",490,200,5,3)
-    enemy2 = Alien("imagens/alien.png",600,250,5,3)
-    enemy3 = Alien("imagens/alien.png",390,300,5,3)
-    enemy4 = Alien("imagens/alien.png",490,310,5,3)
+    enemy = Alien("imagens/alien.png",490,200,5,3,atack_time=4000)
+    enemy2 = Alien("imagens/alien.png",600,250,5,3,atack_time=5000)
+    enemy3 = Alien("imagens/alien.png",390,300,5,3,atack_time=2000)
+    enemy4 = Alien("imagens/alien.png",490,310,5,3,atack_time=7000)
     enemy5 = Alien("imagens/alien.png",parede_esquerda+50,380,5,3)
 
     list_enemys = [enemy,enemy2,enemy3,enemy4,enemy5]
@@ -672,10 +686,7 @@ def fase3(pontos):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 jogador.atacar()
 
-            for enemy in list_enemys:
-
-                if event.type == enemy_atack:
-                    enemy.atack()
+            
 
       
         jogador.move()
@@ -687,6 +698,12 @@ def fase3(pontos):
         
         for enemy in list_enemys:
             enemy.move()
+            current_time = pygame.time.get_ticks()
+            if current_time - enemy.last_attack_time >= enemy.atack_time:
+                # Executar ataque somente se passou tempo suficiente desde o último ataque
+                enemy.last_attack_time = current_time  # Atualiza o tempo do último ataque
+                
+                enemy.atack()
 
         if len(list_enemys) == 0:
             
@@ -708,10 +725,10 @@ def fase3(pontos):
 
 def fase2(pontos):
     jogador = Player(632,591)
-    enemy = Alien("imagens/alien.png",490,200,5,3)
-    enemy2 = Alien("imagens/alien.png",600,250,5,3)
-    enemy3 = Alien("imagens/alien.png",390,300,5,3)
-    enemy4 = Alien("imagens/red_alien.png",parede_esquerda+40,140,10,7)
+    enemy = Alien("imagens/alien.png",490,200,5,3,atack_time=3000)
+    enemy2 = Alien("imagens/alien.png",600,250,5,3,atack_time=5000)
+    enemy3 = Alien("imagens/alien.png",390,300,5,3,atack_time=6000)
+    enemy4 = Alien("imagens/red_alien.png",parede_esquerda+40,140,10,7,atack_time=1000)
 
     list_enemys = [enemy,enemy2,enemy3,enemy4]
     
@@ -737,11 +754,7 @@ def fase2(pontos):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 jogador.atacar()
 
-            for enemy in list_enemys:
-
-                if event.type == enemy_atack:
-                    enemy.atack()
-
+            
       
         jogador.move()
         jogador.draw()
@@ -750,12 +763,19 @@ def fase2(pontos):
             pontos+=1
         
         
-        for enemy in list_enemys:
-            enemy.move()
-
+       
         if len(list_enemys) == 0:
             
             mudanca(fase3,"Fase 3",pontos)
+
+        for enemy in list_enemys:
+            enemy.move()
+            current_time = pygame.time.get_ticks()
+            if current_time - enemy.last_attack_time >= enemy.atack_time:
+                # Executar ataque somente se passou tempo suficiente desde o último ataque
+                enemy.last_attack_time = current_time  # Atualiza o tempo do último ataque
+                
+                enemy.atack()
 
 
         score = fonte_pequena.render(f"Score: {pontos}",True,(255,255,255))
@@ -773,9 +793,9 @@ def fase2(pontos):
 def fase1(pontos):
     
     jogador = Player(632,591)
-    enemy = Alien("imagens/alien.png",490,200,5,3)
-    enemy2 = Alien("imagens/alien.png",600,250,5,3)
-    enemy3 = Alien("imagens/alien.png",390,300,5,3)
+    enemy = Alien("imagens/alien.png",490,200,5,3,atack_time=2000)
+    enemy2 = Alien("imagens/alien.png",600,250,5,3,atack_time=8000)
+    enemy3 = Alien("imagens/alien.png",390,300,5,3,atack_time=4000)
 
     list_enemys = [enemy,enemy2,enemy3]
     
@@ -801,10 +821,7 @@ def fase1(pontos):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 jogador.atacar()
 
-            for enemy in list_enemys:
-
-                if event.type == enemy_atack:
-                    enemy.atack()
+            
 
 
       
@@ -817,6 +834,14 @@ def fase1(pontos):
         
         for enemy in list_enemys:
             enemy.move()
+            current_time = pygame.time.get_ticks()
+            if current_time - enemy.last_attack_time >= enemy.atack_time:
+                # Executar ataque somente se passou tempo suficiente desde o último ataque
+                enemy.last_attack_time = current_time  # Atualiza o tempo do último ataque
+                
+                enemy.atack()
+            
+        
 
         if len(list_enemys) == 0:
          
