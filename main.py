@@ -1,5 +1,5 @@
 import pygame,sys
-import abc
+# import abc
 
 
 pygame.init()
@@ -7,7 +7,7 @@ pygame.init()
 # Inicialize os dispositivos de joystick
 pygame.joystick.init()
 
-
+ 
 # Verifique se há pelo menos um joystick conectado
 if pygame.joystick.get_count() == 0:
     print("Nenhum joystick encontrado. Certifique-se de que um controle de PS4 está conectado.")
@@ -285,12 +285,17 @@ class Player():
 
         else:
             # Verifica colisões com os inimigos e remove-os da lista se a vida chegar a 0
-            for rect in self.laser_list[:]:  # Itera sobre uma cópia da lista laser_list
-                for enemy in lista_enemys[:]:  # Itera sobre uma cópia da lista lista_enemys
+            for rect in self.laser_list:  # Itera sobre uma cópia da lista laser_list
+                for enemy in lista_enemys:  # Itera sobre uma cópia da lista lista_enemys
                     if enemy.img_rect.colliderect(rect):
                         enemy.life -= 1
                         esplosao.play()
-                        self.laser_list.remove(rect)  # Remove o projétil da lista original
+                        if rect in self.laser_list:
+                            self.laser_list.remove(rect)  # Remove o projétil da lista original
+                        else:
+                            # print("O elemento não está na lista.")
+                            pass
+                        
                         if enemy.life <= 0:
                             lista_enemys.remove(enemy) 
                             return True 
