@@ -284,14 +284,14 @@ class Player():
                     self.life -= 1
 
         else:
-            # Verifica colisões com os inimigos e remove-os da lista se a vida chegar a 0
-            for rect in self.laser_list:  # Itera sobre uma cópia da lista laser_list
-                for enemy in lista_enemys:  # Itera sobre uma cópia da lista lista_enemys
+        
+            for rect in self.laser_list:
+                for enemy in lista_enemys: 
                     if enemy.img_rect.colliderect(rect):
                         enemy.life -= 1
                         esplosao.play()
                         if rect in self.laser_list:
-                            self.laser_list.remove(rect)  # Remove o projétil da lista original
+                            self.laser_list.remove(rect)  
                         else:
                             # print("O elemento não está na lista.")
                             pass
@@ -304,6 +304,25 @@ class Player():
 
 def off():
     while True:
+
+        if pygame.joystick.get_count() == 0:
+            pass
+        else:
+            botao_x = controle_ps4.get_button(0) 
+            up = controle_ps4.get_button(11)
+            square = controle_ps4.get_button(2)
+            triangulo = controle_ps4.get_button(3)
+            ps = controle_ps4.get_button(5)
+            to_rigth = controle_ps4.get_button(14)
+            middle = controle_ps4.get_button(15)
+            r1 = controle_ps4.get_button(10)
+            to_left = controle_ps4.get_button(13)
+            down = controle_ps4.get_button(12)
+
+            
+
+          
+            
         janela.fill((255,255,255))
         janela.blit(fundo_desligado,(0,0))
 
@@ -322,6 +341,7 @@ def off():
 
 def mudanca(fase, texto,pontos):
     # Loop principal para exibir a mudança de fase
+    pygame.mixer.music.stop()
     while True:
         # Preenche a janela com uma cor sólida
         janela.fill((0, 0, 0))
@@ -352,6 +372,18 @@ def mudanca(fase, texto,pontos):
 
 def game_over():
     while True:
+
+        if pygame.joystick.get_count() == 0:
+            pass
+        else:
+            botao_x = controle_ps4.get_button(0) 
+            
+        
+            if botao_x:       
+                menu(0)
+
+           
+
         janela.fill((255,255,255))
         janela.blit(fundo,(0,0))
 
@@ -389,6 +421,9 @@ def menu(pontos):
     indice = 0
     azul = (0,0,255)
     branco = (255,255,255)
+        # Definindo variáveis para controle do tempo de repetição
+    tempo_ultimo_evento = 0
+    tempo_entre_eventos = 200  # Tempo mínimo entre eventos em milissegundos
    
     while True:
         
@@ -400,16 +435,32 @@ def menu(pontos):
         else:
             botao_x = controle_ps4.get_button(0) 
             up = controle_ps4.get_button(11)
-        
-            if botao_x and indice == 0:        
-                fase1(pontos)
+            square = controle_ps4.get_button(2)
+            
+            down = controle_ps4.get_button(12)
+
 
             if up:
-                menu_selection.play()
-                indice-=1
-                if indice <0:
-                    indice = opcoes
-            
+                tempo_atual = pygame.time.get_ticks()
+                if tempo_atual - tempo_ultimo_evento > tempo_entre_eventos:
+                    menu_selection.play()
+                    indice -= 1
+                    if indice < 0:
+                        indice = opcoes-1
+                    # Atualiza o tempo do último evento
+                    tempo_ultimo_evento = tempo_atual
+
+            if down:
+                tempo_atual = pygame.time.get_ticks()
+                if tempo_atual - tempo_ultimo_evento > tempo_entre_eventos:
+                    menu_selection.play()
+                    indice += 1
+                    if indice > opcoes-1:
+                        indice = 0
+                    # Atualiza o tempo do último evento
+                    tempo_ultimo_evento = tempo_atual
+               
+        print(indice)
 
 
         for event in pygame.event.get():
@@ -417,8 +468,14 @@ def menu(pontos):
                 pygame.quit()
                 sys.exit()
 
+            if event.type == pygame.JOYBUTTONDOWN:
+                if controle_ps4.get_button(0) and indice == 0:
+                    pygame.mixer.music.stop()
+                    mudanca(fase1,"Fase 1",pontos)
+                    
+
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE and indice == 0:
+                if (event.key == pygame.K_SPACE) and indice == 0:
                     pygame.mixer.music.stop()
                     mudanca(fase1,"Fase 1",pontos)
                     
@@ -490,7 +547,7 @@ def tchau(pontos):
                     menu(pontos)
                 if event.key == pygame.K_SPACE and indice == 0:
                     cursor_select.play()
-                    time.sleep(1)
+                
                     pygame.quit()
                     sys.exit()
 
