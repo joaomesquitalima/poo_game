@@ -16,6 +16,13 @@ else:
     controle_ps4 = pygame.joystick.Joystick(0)
     controle_ps4.init()
 
+# Defina um evento personalizado
+inicio_ataque= pygame.USEREVENT + 1
+
+pygame.time.set_timer(inicio_ataque, 5000)
+# Permitindo o tipo de evento personalizado
+pygame.event.set_allowed([inicio_ataque])
+
 
 parede_esquerda = 357
 parede_direita = 860
@@ -220,6 +227,7 @@ class Player():
         self.life = life  # Vida do jogador
         # Retângulo representando a posição e tamanho do jogador na tela
         self.player_rect = player.get_rect(center=(self.x, self.y))
+        self.tempo_ultimo_evento = 0
     
     def atacar(self):
         # Método para o jogador atirar
@@ -228,6 +236,8 @@ class Player():
         
         self.laser_list.append(laser_rect)  # Adiciona um novo tiro à lista
         fire.play()  # Reproduz o som de tiro
+
+
 
     def update_life(self, lista_enemys=None):
         # Método para atualizar a vida do jogador e exibir na tela
@@ -250,10 +260,12 @@ class Player():
         # Método para mover o jogador na tela de acordo com as teclas pressionadas
         teclas = pygame.key.get_pressed()
         dx = 0
-        if (teclas[pygame.K_LEFT] or teclas[pygame.K_a]) and self.player_rect.x > parede_esquerda:
+        if (teclas[pygame.K_LEFT] or teclas[pygame.K_a] or controle_ps4.get_button(13)) and self.player_rect.x > parede_esquerda:
             dx = -self.velocidade
-        if (teclas[pygame.K_RIGHT] or teclas[pygame.K_d]) and self.player_rect.x < parede_direita:
+        if (teclas[pygame.K_RIGHT] or teclas[pygame.K_d] or controle_ps4.get_button(14)) and self.player_rect.x < parede_direita:
             dx = self.velocidade
+
+        
         self.player_rect.x += dx
 
     def draw(self):
@@ -330,6 +342,10 @@ def off():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
+            if event.type == pygame.JOYBUTTONUP:
+                mudanca(menu,"ligando",0)
+                
 
             if event.type == pygame.KEYDOWN:
                 
@@ -460,7 +476,7 @@ def menu(pontos):
                     # Atualiza o tempo do último evento
                     tempo_ultimo_evento = tempo_atual
                
-        print(indice)
+    
 
 
         for event in pygame.event.get():
@@ -632,15 +648,6 @@ def final(pontos):
     boss = Boss(largura_janela/2,altura_janela/2 - 100,200)
     moving_sprites.add(boss)
 
-    # Defina um evento personalizado
-    inicio_ataque= pygame.USEREVENT + 1
-
-
-
-    pygame.time.set_timer(inicio_ataque, 5 * 1000)
-
-   
-
     ataque = False
 
     texto =  fonte_terraria.render("Cérebro de Cthulhu nasceu",True,(255,255,255))
@@ -652,6 +659,10 @@ def final(pontos):
         janela.blit(fundo,(0,0))
         boss.ai()
 
+        if ataque == False:
+            janela.blit(texto,texto_rect)
+        else:
+            pass
         
 
         jogador_rect = jogador.player_rect
@@ -660,36 +671,40 @@ def final(pontos):
 
         jogador.colidir(lista_enemys=False,boss=boss)
 
-        if ataque == False:
-            janela.blit(texto,texto_rect)
-
 
         # percorre todos os eventos que ocorrem no jogo
         for event in pygame.event.get():
+
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-
+            
             if event.type == inicio_ataque:
                 ataque = True
-
-            # if ataque and event.type == padrao1:
-            #     boss.atack(jogador_rect.x - 65)
-                
+           
 
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    jogador.atacar()
-                    
-            if event.type == pygame.MOUSEBUTTONDOWN:
                 jogador.atacar()
+
+            if event.type == pygame.JOYBUTTONDOWN:
+                if controle_ps4.get_button(2):
+                    jogador.atacar()
+
+
+        
+                
+
+        
+
+         
 
         #faz com que o jogador se mova
         jogador.move()
+     
         
         if boss.life <150 and boss.life >0:
             boss.atack(jogador_rect.x - 65,1000)
-            print("Parte 2")
+            # print("Parte 2")
         elif boss.life >=150:
             boss.atack(jogador_rect.x - 65,2000)
         elif boss.life <=0:
@@ -736,23 +751,26 @@ def fase4(pontos):
        
         clock.tick(60)
        
+       
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    jogador.atacar()
-                    
-            if event.type == pygame.MOUSEBUTTONDOWN:
                 jogador.atacar()
 
+            if event.type == pygame.JOYBUTTONDOWN:
+                if controle_ps4.get_button(2):
+                    jogador.atacar()
+
+            
             
 
       
         jogador.move()
         jogador.draw()
+        
         
         if jogador.colidir(list_enemys):
             pontos+=1
@@ -807,6 +825,7 @@ def fase3(pontos):
 
        
         clock.tick(60)
+      
        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -814,17 +833,19 @@ def fase3(pontos):
                 sys.exit()
 
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    jogador.atacar()
-                    
-            if event.type == pygame.MOUSEBUTTONDOWN:
                 jogador.atacar()
+
+            if event.type == pygame.JOYBUTTONDOWN:
+                if controle_ps4.get_button(2):
+                    jogador.atacar()
+
 
             
 
       
         jogador.move()
         jogador.draw()
+        
         
         if jogador.colidir(list_enemys):
             pontos+=1
@@ -879,22 +900,26 @@ def fase2(pontos):
        
         clock.tick(60)
        
+       
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    jogador.atacar()
-                    
-            if event.type == pygame.MOUSEBUTTONDOWN:
                 jogador.atacar()
+
+            if event.type == pygame.JOYBUTTONDOWN:
+                if controle_ps4.get_button(2):
+                    jogador.atacar()
+
+           
 
             
       
         jogador.move()
         jogador.draw()
+        
         
         if jogador.colidir(list_enemys):
             pontos+=1
@@ -948,6 +973,8 @@ def fase1(pontos):
 
        
         clock.tick(60)
+        
+        
        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -955,11 +982,14 @@ def fase1(pontos):
                 sys.exit()
 
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    jogador.atacar()
-                    
-            if event.type == pygame.MOUSEBUTTONDOWN:
                 jogador.atacar()
+
+            if event.type == pygame.JOYBUTTONDOWN:
+                if controle_ps4.get_button(2):
+                    jogador.atacar()
+
+
+            
 
             
 
@@ -967,6 +997,7 @@ def fase1(pontos):
       
         jogador.move()
         jogador.draw()
+        
         
         if jogador.colidir(list_enemys):
             pontos+=1
