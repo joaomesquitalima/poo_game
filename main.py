@@ -1,5 +1,6 @@
-import pygame,sys
 from abc import ABC, abstractmethod
+import pygame,sys
+
 
 pygame.init()
 
@@ -16,12 +17,10 @@ else:
     controle_ps4 = pygame.joystick.Joystick(0)
     controle_ps4.init()
 
-# Defina um evento personalizado
-inicio_ataque= pygame.USEREVENT + 1
 
-pygame.time.set_timer(inicio_ataque, 5000)
-# Permitindo o tipo de evento personalizado
-pygame.event.set_allowed([inicio_ataque])
+
+enemy_atack = pygame.USEREVENT + 3
+pygame.time.set_timer(enemy_atack, 1000)
 
 
 parede_esquerda = 357
@@ -73,11 +72,6 @@ laser_rect = laser.get_rect()
 
 
 clock = pygame.time.Clock()
-
-
-enemy_atack = pygame.USEREVENT + 3
-pygame.time.set_timer(enemy_atack, 1000)
-
 
 
 class Boss(pygame.sprite.Sprite):
@@ -143,7 +137,6 @@ class Boss(pygame.sprite.Sprite):
             # Executar ataque somente se passou tempo suficiente desde o último ataque
             self.last_attack_time = current_time  # Atualiza o tempo do último ataque
                 
-            
             if (x + 65) >= 810:
                 self.rect.x = x - 70
                 bullet = self.bullet.get_rect(center=(self.rect.x + 150, self.rect.y))
@@ -182,7 +175,7 @@ class Alien(Enemy):
         # Chama o construtor da classe pai para inicializar atributos comuns
         super().__init__(img, x, y, life, velocidade)
         self.lasers_list = []
-        self.laser = pygame.image.load("alien_laser.png").convert_alpha()
+        self.laser = pygame.image.load("imagens/alien_laser.png").convert_alpha()
         self.atack_time = atack_time
         self.last_attack_time = pygame.time.get_ticks() 
         
@@ -190,26 +183,19 @@ class Alien(Enemy):
         bullet = self.laser.get_rect(center=(self.img_rect.x + 40, self.img_rect.y+10))
         self.lasers_list.append(bullet)
 
-    
-        
-
     def move(self):
-
-        
         for bala in self.lasers_list:
-            
             bala.y += 10
             if bala.y > altura_janela - 150:
                 self.lasers_list.remove(bala)
                 
-
             janela.blit(self.laser,bala)
       
         if self.img_rect.x < parede_esquerda:
             self.vel_enemy = self.velocidade
             self.img_rect.y +=10
             
-            # pass
+     
         if self.img_rect.x > parede_direita:
             self.vel_enemy = -self.velocidade
             self.img_rect.y +=5
@@ -219,8 +205,6 @@ class Alien(Enemy):
         janela.blit(self.img,self.img_rect)
 
         
-            
-
 class Player():
     def __init__(self, x, y, life=4):
         # Inicialização do jogador com posição, vida e velocidade padrão
@@ -290,9 +274,9 @@ class Player():
                     self.laser_list.remove(rect)
                     esplosao.play()
 
-                for bullet in boss.lista_bullet:
-                    if bullet.colliderect(rect):
-                        boss.lista_bullet.remove(bullet)
+                # for bullet in boss.lista_bullet:
+                #     if bullet.colliderect(rect):
+                #         boss.lista_bullet.remove(bullet)
 
             for bullet in boss.lista_bullet:
                 if self.player_rect.colliderect(bullet):
@@ -316,29 +300,9 @@ class Player():
                             lista_enemys.remove(enemy) 
                             return True 
                             
-
-
 def off():
     while True:
-
-        if pygame.joystick.get_count() == 0:
-            pass
-        else:
-            botao_x = controle_ps4.get_button(0) 
-            up = controle_ps4.get_button(11)
-            square = controle_ps4.get_button(2)
-            triangulo = controle_ps4.get_button(3)
-            ps = controle_ps4.get_button(5)
-            to_rigth = controle_ps4.get_button(14)
-            middle = controle_ps4.get_button(15)
-            r1 = controle_ps4.get_button(10)
-            to_left = controle_ps4.get_button(13)
-            down = controle_ps4.get_button(12)
-
-            
-
-          
-            
+    
         janela.fill((255,255,255))
         janela.blit(fundo_desligado,(0,0))
 
@@ -356,7 +320,6 @@ def off():
                 mudanca(menu,"ligando",0)
 
         pygame.display.update()
-
 
 
 def mudanca(fase, texto,pontos):
@@ -385,9 +348,9 @@ def mudanca(fase, texto,pontos):
         
         # Aguarda 2 segundos antes de chamar a próxima fase
         pygame.time.wait(2000)
-        fase(pontos)  # Chama a próxima fase após o tempo de espera
-
-
+        # # Configurando o jogo com a fase de início
+        jogo.definir_fase(fase(pontos))
+        jogo.jogar_jogo()  # Saída: Bem-vindo ao jogo! Iniciando fase.
 
 
 def game_over():
@@ -429,13 +392,10 @@ def menu(pontos):
     # Carregue a música
     pygame.mixer.music.load('musica/menu.mp3')
     
-    
-
     # Defina o volume (opcional)
     pygame.mixer.music.set_volume(1.0)  # Valor varia de 0.0 a 1.0
     
     pygame.mixer.music.play(-1)
-
 
     opcoes = 3
     indice = 0
@@ -453,13 +413,10 @@ def menu(pontos):
         if pygame.joystick.get_count() == 0:
             pass
         else:
-            botao_x = controle_ps4.get_button(0) 
-            up = controle_ps4.get_button(11)
-            square = controle_ps4.get_button(2)
-            
-            down = controle_ps4.get_button(12)
+            up = controle_ps4.get_button(11) #seta pra cima,ps4
+            down = controle_ps4.get_button(12) #seta pra baixo
 
-
+            #quando a seta pra cima for pressionada
             if up:
                 tempo_atual = pygame.time.get_ticks()
                 if tempo_atual - tempo_ultimo_evento > tempo_entre_eventos:
@@ -491,7 +448,7 @@ def menu(pontos):
             if event.type == pygame.JOYBUTTONDOWN:
                 if controle_ps4.get_button(0) and indice == 0:
                     pygame.mixer.music.stop()
-                    mudanca(fase1,"Fase 1",pontos)
+                    mudanca(Fase1,"Fase 1",pontos)
                 
                 if controle_ps4.get_button(0) and indice == 2:
                     cursor_select.play()
@@ -502,7 +459,7 @@ def menu(pontos):
             if event.type == pygame.KEYDOWN:
                 if (event.key == pygame.K_SPACE) and indice == 0:
                     pygame.mixer.music.stop()
-                    mudanca(fase1,"Fase 1",pontos)
+                    mudanca(Fase1,"Fase 1",pontos)
                     
                 if event.key == pygame.K_SPACE and indice == 2:
                     cursor_select.play()
@@ -569,9 +526,9 @@ def tchau(pontos):
         if pygame.joystick.get_count() == 0:
             pass
         else:
-            botao_x = controle_ps4.get_button(0) 
+           
             up = controle_ps4.get_button(11)
-            square = controle_ps4.get_button(2)
+           
             
             down = controle_ps4.get_button(12)
 
@@ -623,13 +580,13 @@ def tchau(pontos):
                 if event.key == pygame.K_s:
                     menu_selection.play()
                     indice = indice +1
-                    if indice>=len(opcoes):
+                    if indice>=opcoes:
                         indice = 0
                 if event.key == pygame.K_w:
                     menu_selection.play()
                     indice = indice - 1
                     if indice <0:
-                        indice = len(opcoes)-1
+                        indice = opcoes-1
 
            
 
@@ -673,9 +630,10 @@ def fim():
                 sys.exit()
 
             if event.type == pygame.KEYDOWN:
-                
-                # mudanca(menu,"GAMER OVER",0)
                 menu(0)
+
+            # if event.type == pygame.JOYBUTTONUP:
+            #     mudanca(menu,"ligando",0)
 
         start = fonte.render("FIM...",True,(255,255,255))
         start_rect = start.get_rect(center=(largura_janela/2,altura_janela/2))
@@ -684,386 +642,442 @@ def fim():
 
         pygame.display.update()
 
-def final(pontos):
-    #instanciando um objeto player
-    jogador = Player(632,591)
-    jogador.laser_list = []
+# Define a classe abstrata Fase
+class Fase(ABC):
+    @abstractmethod
+    def jogar(self):
+        pass
+
+# Implementa diferentes fases do jogo
+class Fase1(Fase):
+    def __init__(self,pontos):
+        self.pontos = pontos
+    def jogar(self):
+        jogador = Player(632,591)
+        enemy = Alien("imagens/alien.png",490,200,5,3,atack_time=2000)
+        enemy2 = Alien("imagens/alien.png",600,250,5,3,atack_time=8000)
+        enemy3 = Alien("imagens/alien.png",390,300,5,3,atack_time=4000)
+
+        list_enemys = [enemy,enemy2,enemy3]
+        
+        
+
+        while True:
+            janela.fill((255,255,255))
+            janela.blit(fundo,(0,0))
+
+            jogador_rect = jogador.player_rect
+
+        
+            clock.tick(60)
+            
+            
+        
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        jogador.atacar()
+
+                if event.type == pygame.JOYBUTTONDOWN:
+                    if controle_ps4.get_button(2):
+                        jogador.atacar()
+
+        
+            jogador.move()
+            jogador.draw()
+            
+            
+            if jogador.colidir(list_enemys):
+                self.pontos+=1
+            
+            
+            for enemy in list_enemys:
+                enemy.move()
+                current_time = pygame.time.get_ticks()
+                if current_time - enemy.last_attack_time >= enemy.atack_time:
+                    # Executar ataque somente se passou tempo suficiente desde o último ataque
+                    enemy.last_attack_time = current_time  # Atualiza o tempo do último ataque
+                    
+                    enemy.atack()
+                
+            
+
+            if len(list_enemys) == 0:
+                mudanca(Fase2,"Fase 2",self.pontos)
+
+
+            score = fonte_pequena.render(f"Score: {self.pontos}",True,(255,255,255))
+            vidas = fonte_pequena.render("Life:",True,(255,255,255))
+
+            
     
-   
-    pygame.mixer.music.load("audios/boss_music.mpeg")
+            janela.blit(player,jogador_rect)
+            janela.blit(score,(parede_esquerda +4,90))
+            janela.blit(vidas,(parede_esquerda +4,127))
+            jogador.update_life(list_enemys)
 
-    pygame.mixer.music.play(-1)
-    pygame.mixer.music.set_volume(1)
+            if jogador.life <=0:
+                game_over()
 
-    boss_nascendo = pygame.mixer.Sound("audios/boss_nascendo.mp3")
-    boss_nascendo.play()
+            pygame.display.update()
+        
+
+class Fase2(Fase):
+    def __init__(self,pontos):
+        self.pontos = pontos
+    def jogar(self):
+        jogador = Player(632,591)
+        enemy = Alien("imagens/alien.png",490,200,5,3,atack_time=3000)
+        enemy2 = Alien("imagens/alien.png",600,250,5,3,atack_time=5000)
+        enemy3 = Alien("imagens/alien.png",390,300,5,3,atack_time=6000)
+        enemy4 = Alien("imagens/red_alien.png",parede_esquerda+40,140,10,7,atack_time=1000)
+
+        list_enemys = [enemy,enemy2,enemy3,enemy4]
+        
+        
+        while True:
+            janela.fill((255,255,255))
+            janela.blit(fundo,(0,0))
+
+            jogador_rect = jogador.player_rect
+
+        
+            clock.tick(60)
+        
+        
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        jogador.atacar()
+
+                if event.type == pygame.JOYBUTTONDOWN:
+                    if controle_ps4.get_button(2):
+                        jogador.atacar()
+
+            jogador.move()
+            jogador.draw()
+            
+            
+            if jogador.colidir(list_enemys):
+                self.pontos+=1
+            
+            
+        
+            if len(list_enemys) == 0:
+                
+                mudanca(Fase3,"Fase 3",self.pontos)
+
+            for enemy in list_enemys:
+                enemy.move()
+                current_time = pygame.time.get_ticks()
+                if current_time - enemy.last_attack_time >= enemy.atack_time:
+                    # Executar ataque somente se passou tempo suficiente desde o último ataque
+                    enemy.last_attack_time = current_time  # Atualiza o tempo do último ataque
+                    
+                    enemy.atack()
 
 
-    moving_sprites = pygame.sprite.Group()
-    boss = Boss(largura_janela/2,altura_janela/2 - 100,200)
-    moving_sprites.add(boss)
+            score = fonte_pequena.render(f"Score: {self.pontos}",True,(255,255,255))
+            vidas = fonte_pequena.render("Life:",True,(255,255,255))
 
-    ataque = False
+            
+    
+            janela.blit(player,jogador_rect)
+            janela.blit(score,(parede_esquerda +4,90))
+            janela.blit(vidas,(parede_esquerda +4,127))
+            jogador.update_life(list_enemys)
 
-    texto =  fonte_terraria.render("Cérebro de Cthulhu nasceu",True,(255,255,255))
-    texto_rect = texto.get_rect(center = (largura_janela/2,altura_janela/2))
-    parte2 = False
-    while True:
-        clock.tick(60)
-        janela.fill((255,255,255))
-        janela.blit(fundo,(0,0))
-        boss.ai()
+            if jogador.life <=0:
+                game_over()
 
-        if ataque == False:
-            janela.blit(texto,texto_rect)
+            pygame.display.update()
+
+
+class Fase3(Fase):
+    def __init__(self,pontos):
+        self.pontos = pontos
+        
+    def jogar(self):
+        jogador = Player(632,591)
+        enemy = Alien("imagens/alien.png",490,200,5,3,atack_time=4000)
+        enemy2 = Alien("imagens/alien.png",600,250,5,3,atack_time=5000)
+        enemy3 = Alien("imagens/alien.png",390,300,5,3,atack_time=2000)
+        enemy4 = Alien("imagens/alien.png",490,310,5,3,atack_time=7000)
+        enemy5 = Alien("imagens/alien.png",parede_esquerda+50,380,5,3)
+
+        list_enemys = [enemy,enemy2,enemy3,enemy4,enemy5]
+        
+        
+        while True:
+            janela.fill((255,255,255))
+            janela.blit(fundo,(0,0))
+
+            jogador_rect = jogador.player_rect
+
+        
+            clock.tick(60)
+        
+        
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        jogador.atacar()
+
+                if event.type == pygame.JOYBUTTONDOWN:
+                    if controle_ps4.get_button(2):
+                        jogador.atacar()
+
+
+            jogador.move()
+            jogador.draw()
+            
+            
+            if jogador.colidir(list_enemys):
+                self.pontos+=1
+            
+            
+            for enemy in list_enemys:
+                enemy.move()
+                current_time = pygame.time.get_ticks()
+                if current_time - enemy.last_attack_time >= enemy.atack_time:
+                    # Executar ataque somente se passou tempo suficiente desde o último ataque
+                    enemy.last_attack_time = current_time  # Atualiza o tempo do último ataque
+                    
+                    enemy.atack()
+
+            if len(list_enemys) == 0:
+                
+                mudanca(Fase4,"Fase 4",self.pontos)
+
+
+            score = fonte_pequena.render(f"Score: {self.pontos}",True,(255,255,255))
+            vidas = fonte_pequena.render("Life:",True,(255,255,255))
+
+            
+    
+            janela.blit(player,jogador_rect)
+            janela.blit(score,(parede_esquerda +4,90))
+            janela.blit(vidas,(parede_esquerda +4,127))
+            jogador.update_life(list_enemys)
+
+            if jogador.life <=0:
+                game_over()
+
+            pygame.display.update()
+            
+
+class Fase4(Fase):
+    def __init__(self,pontos):
+        self.pontos = pontos
+    def jogar(self):
+        jogador = Player(632,591)
+        enemy = Alien("imagens/alien.png",parede_esquerda+20,200,5,3,atack_time=1000)
+        enemy2 = Alien("imagens/alien.png",parede_direita-20,250,5,3,atack_time=2000)
+        enemy3 = Alien("imagens/alien.png",490,300,5,3,atack_time=6000)
+
+        list_enemys = [enemy,enemy2,enemy3]
+        
+    
+        while True:
+            janela.fill((255,255,255))
+            janela.blit(fundo,(0,0))
+
+            jogador_rect = jogador.player_rect
+
+        
+            clock.tick(60)
+        
+        
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        jogador.atacar()
+
+                if event.type == pygame.JOYBUTTONDOWN:
+                    if controle_ps4.get_button(2):
+                        jogador.atacar()
+
+
+            jogador.move()
+            jogador.draw()
+            
+            
+            if jogador.colidir(list_enemys):
+                self.pontos+=1
+            
+            
+            for enemy in list_enemys:
+                enemy.move()
+                current_time = pygame.time.get_ticks()
+                if current_time - enemy.last_attack_time >= enemy.atack_time:
+                    # Executar ataque somente se passou tempo suficiente desde o último ataque
+                    enemy.last_attack_time = current_time  # Atualiza o tempo do último ataque
+                    
+                    enemy.atack()
+
+            if len(list_enemys) == 0:
+                mudanca(Final,"BOSS FINAL !",self.pontos)
+                
+
+
+            score = fonte_pequena.render(f"Score: {self.pontos}",True,(255,255,255))
+            vidas = fonte_pequena.render("Life:",True,(255,255,255))
+
+            
+    
+            janela.blit(player,jogador_rect)
+            janela.blit(score,(parede_esquerda +4,90))
+            janela.blit(vidas,(parede_esquerda +4,127))
+            jogador.update_life(list_enemys)
+
+            if jogador.life <=0:
+                game_over()
+
+            pygame.display.update()
+        
+
+class Final(Fase):
+    def __init__(self,pontos):
+        self.pontos = pontos
+
+    def jogar(self):
+        #instanciando um objeto player
+        jogador = Player(632,591)
+        jogador.laser_list = []
+
+        # Defina um evento personalizado
+        inicio_ataque= pygame.USEREVENT + 1
+
+        pygame.time.set_timer(inicio_ataque, 5000)
+        # Permitindo o tipo de evento personalizado
+        pygame.event.set_allowed([inicio_ataque])
+        
+    
+        pygame.mixer.music.load("audios/boss_music.mpeg")
+
+        pygame.mixer.music.play(-1)
+        pygame.mixer.music.set_volume(1)
+
+        boss_nascendo = pygame.mixer.Sound("audios/boss_nascendo.mp3")
+        boss_nascendo.play()
+
+
+        moving_sprites = pygame.sprite.Group()
+        boss = Boss(largura_janela/2,altura_janela/2 - 100,50)
+        moving_sprites.add(boss)
+
+        ataque = False
+
+        texto =  fonte_terraria.render("Cérebro de Cthulhu nasceu",True,(255,255,255))
+        texto_rect = texto.get_rect(center = (largura_janela/2,altura_janela/2))
+        parte2 = False
+        while True:
+            clock.tick(60)
+            janela.fill((255,255,255))
+            janela.blit(fundo,(0,0))
+            boss.ai()
+
+            if ataque == False:
+                janela.blit(texto,texto_rect)
+            else:
+                pass
+            
+
+            jogador_rect = jogador.player_rect
+            jogador.draw()
+            
+
+            jogador.colidir(lista_enemys=False,boss=boss)
+
+
+            # percorre todos os eventos que ocorrem no jogo
+            for event in pygame.event.get():
+
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                
+                if event.type == inicio_ataque:
+                    ataque = True
+            
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        jogador.atacar()
+
+                if event.type == pygame.JOYBUTTONDOWN:
+                    if controle_ps4.get_button(2):
+                        jogador.atacar()
+
+
+            #faz com que o jogador se mova
+            jogador.move()
+        
+            
+            if boss.life <150 and boss.life >0:
+                boss.atack(jogador_rect.x - 65,1000)
+                # print("Parte 2")
+            elif boss.life >=150:
+                boss.atack(jogador_rect.x - 65,2000)
+            elif boss.life <=0:
+                fim()
+
+
+            #desenha os sprites do boss
+            moving_sprites.draw(janela)
+            moving_sprites.update(janela,jogador_rect.x - 50)
+            
+            
+            janela.blit(player,jogador_rect)
+
+            
+            vidas = fonte_pequena.render("Life:",True,(255,255,255))
+            janela.blit(vidas,(parede_esquerda +4,127))
+            jogador.update_life(None)
+
+            if jogador.life <=0:
+                game_over()
+
+
+            #atualiza janela
+            pygame.display.update()
+
+
+# Contexto que utiliza o padrão State
+class Jogo:
+    def __init__(self):
+        self.fase_atual = None
+    
+    def definir_fase(self, fase):
+        self.fase_atual = fase
+
+    def jogar_jogo(self):
+        if self.fase_atual:
+            self.fase_atual.jogar()
         else:
-            pass
-        
+            print("Nenhuma fase definida.")
 
-        jogador_rect = jogador.player_rect
-        jogador.draw()
-        
+# Uso do padrão State para representar as fases do jogo
+jogo = Jogo()
 
-        jogador.colidir(lista_enemys=False,boss=boss)
 
 
-        # percorre todos os eventos que ocorrem no jogo
-        for event in pygame.event.get():
+if __name__ == "__main__":
+    off()
 
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            
-            if event.type == inicio_ataque:
-                ataque = True
-           
-
-            if event.type == pygame.KEYDOWN:
-                jogador.atacar()
-
-            if event.type == pygame.JOYBUTTONDOWN:
-                if controle_ps4.get_button(2):
-                    jogador.atacar()
-
-
-        #faz com que o jogador se mova
-        jogador.move()
-     
-        
-        if boss.life <150 and boss.life >0:
-            boss.atack(jogador_rect.x - 65,1000)
-            # print("Parte 2")
-        elif boss.life >=150:
-            boss.atack(jogador_rect.x - 65,2000)
-        elif boss.life <=0:
-            fim()
-
-
-        #desenha os sprites do boss
-        moving_sprites.draw(janela)
-        moving_sprites.update(janela,jogador_rect.x - 50)
-        
-        
-        janela.blit(player,jogador_rect)
-
-        
-        vidas = fonte_pequena.render("Life:",True,(255,255,255))
-        janela.blit(vidas,(parede_esquerda +4,127))
-        jogador.update_life(None)
-
-        if jogador.life <=0:
-            game_over()
-
-
-        #atualiza janela
-        pygame.display.update()
-
-
-def fase4(pontos):
-    jogador = Player(632,591)
-    enemy = Alien("imagens/alien.png",parede_esquerda+20,200,5,3,atack_time=1000)
-    enemy2 = Alien("imagens/alien.png",parede_direita-20,250,5,3,atack_time=2000)
-    enemy3 = Alien("imagens/alien.png",490,300,5,3,atack_time=6000)
-
-    list_enemys = [enemy,enemy2,enemy3]
-    
- 
-    while True:
-        janela.fill((255,255,255))
-        janela.blit(fundo,(0,0))
-
-        jogador_rect = jogador.player_rect
-
-       
-        clock.tick(60)
-       
-       
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-
-            if event.type == pygame.KEYDOWN:
-                jogador.atacar()
-
-            if event.type == pygame.JOYBUTTONDOWN:
-                if controle_ps4.get_button(2):
-                    jogador.atacar()
-
-
-        jogador.move()
-        jogador.draw()
-        
-        
-        if jogador.colidir(list_enemys):
-            pontos+=1
-        
-        
-        for enemy in list_enemys:
-            enemy.move()
-            current_time = pygame.time.get_ticks()
-            if current_time - enemy.last_attack_time >= enemy.atack_time:
-                # Executar ataque somente se passou tempo suficiente desde o último ataque
-                enemy.last_attack_time = current_time  # Atualiza o tempo do último ataque
-                
-                enemy.atack()
-
-        if len(list_enemys) == 0:
-            mudanca(final,"BOSS FINAL !",pontos)
-            
-
-
-        score = fonte_pequena.render(f"Score: {pontos}",True,(255,255,255))
-        vidas = fonte_pequena.render("Life:",True,(255,255,255))
-
-        
-  
-        janela.blit(player,jogador_rect)
-        janela.blit(score,(parede_esquerda +4,90))
-        janela.blit(vidas,(parede_esquerda +4,127))
-        jogador.update_life(list_enemys)
-
-        if jogador.life <=0:
-            game_over()
-
-        pygame.display.update()
-
-
-def fase3(pontos):
-    jogador = Player(632,591)
-    enemy = Alien("imagens/alien.png",490,200,5,3,atack_time=4000)
-    enemy2 = Alien("imagens/alien.png",600,250,5,3,atack_time=5000)
-    enemy3 = Alien("imagens/alien.png",390,300,5,3,atack_time=2000)
-    enemy4 = Alien("imagens/alien.png",490,310,5,3,atack_time=7000)
-    enemy5 = Alien("imagens/alien.png",parede_esquerda+50,380,5,3)
-
-    list_enemys = [enemy,enemy2,enemy3,enemy4,enemy5]
-    
-    
-    while True:
-        janela.fill((255,255,255))
-        janela.blit(fundo,(0,0))
-
-        jogador_rect = jogador.player_rect
-
-       
-        clock.tick(60)
-      
-       
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-
-            if event.type == pygame.KEYDOWN:
-                jogador.atacar()
-
-            if event.type == pygame.JOYBUTTONDOWN:
-                if controle_ps4.get_button(2):
-                    jogador.atacar()
-
-
-        jogador.move()
-        jogador.draw()
-        
-        
-        if jogador.colidir(list_enemys):
-            pontos+=1
-        
-        
-        for enemy in list_enemys:
-            enemy.move()
-            current_time = pygame.time.get_ticks()
-            if current_time - enemy.last_attack_time >= enemy.atack_time:
-                # Executar ataque somente se passou tempo suficiente desde o último ataque
-                enemy.last_attack_time = current_time  # Atualiza o tempo do último ataque
-                
-                enemy.atack()
-
-        if len(list_enemys) == 0:
-            
-            mudanca(fase4,"Fase 4",pontos)
-
-
-        score = fonte_pequena.render(f"Score: {pontos}",True,(255,255,255))
-        vidas = fonte_pequena.render("Life:",True,(255,255,255))
-
-        
-  
-        janela.blit(player,jogador_rect)
-        janela.blit(score,(parede_esquerda +4,90))
-        janela.blit(vidas,(parede_esquerda +4,127))
-        jogador.update_life(list_enemys)
-
-        if jogador.life <=0:
-            game_over()
-
-        pygame.display.update()
-        
-
-def fase2(pontos):
-    jogador = Player(632,591)
-    enemy = Alien("imagens/alien.png",490,200,5,3,atack_time=3000)
-    enemy2 = Alien("imagens/alien.png",600,250,5,3,atack_time=5000)
-    enemy3 = Alien("imagens/alien.png",390,300,5,3,atack_time=6000)
-    enemy4 = Alien("imagens/red_alien.png",parede_esquerda+40,140,10,7,atack_time=1000)
-
-    list_enemys = [enemy,enemy2,enemy3,enemy4]
-    
-    
-    while True:
-        janela.fill((255,255,255))
-        janela.blit(fundo,(0,0))
-
-        jogador_rect = jogador.player_rect
-
-       
-        clock.tick(60)
-       
-       
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-
-            if event.type == pygame.KEYDOWN:
-                jogador.atacar()
-
-            if event.type == pygame.JOYBUTTONDOWN:
-                if controle_ps4.get_button(2):
-                    jogador.atacar()
-
-        jogador.move()
-        jogador.draw()
-        
-        
-        if jogador.colidir(list_enemys):
-            pontos+=1
-        
-        
-       
-        if len(list_enemys) == 0:
-            
-            mudanca(fase3,"Fase 3",pontos)
-
-        for enemy in list_enemys:
-            enemy.move()
-            current_time = pygame.time.get_ticks()
-            if current_time - enemy.last_attack_time >= enemy.atack_time:
-                # Executar ataque somente se passou tempo suficiente desde o último ataque
-                enemy.last_attack_time = current_time  # Atualiza o tempo do último ataque
-                
-                enemy.atack()
-
-
-        score = fonte_pequena.render(f"Score: {pontos}",True,(255,255,255))
-        vidas = fonte_pequena.render("Life:",True,(255,255,255))
-
-        
-  
-        janela.blit(player,jogador_rect)
-        janela.blit(score,(parede_esquerda +4,90))
-        janela.blit(vidas,(parede_esquerda +4,127))
-        jogador.update_life(list_enemys)
-
-        if jogador.life <=0:
-            game_over()
-
-        pygame.display.update()
-
-def fase1(pontos):
-    
-    jogador = Player(632,591)
-    enemy = Alien("imagens/alien.png",490,200,5,3,atack_time=2000)
-    enemy2 = Alien("imagens/alien.png",600,250,5,3,atack_time=8000)
-    enemy3 = Alien("imagens/alien.png",390,300,5,3,atack_time=4000)
-
-    list_enemys = [enemy,enemy2,enemy3]
-    
-
-    while True:
-        janela.fill((255,255,255))
-        janela.blit(fundo,(0,0))
-
-        jogador_rect = jogador.player_rect
-
-       
-        clock.tick(60)
-        
-        
-       
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-
-            if event.type == pygame.KEYDOWN:
-                jogador.atacar()
-
-            if event.type == pygame.JOYBUTTONDOWN:
-                if controle_ps4.get_button(2):
-                    jogador.atacar()
-
-      
-        jogador.move()
-        jogador.draw()
-        
-        
-        if jogador.colidir(list_enemys):
-            pontos+=1
-        
-        
-        for enemy in list_enemys:
-            enemy.move()
-            current_time = pygame.time.get_ticks()
-            if current_time - enemy.last_attack_time >= enemy.atack_time:
-                # Executar ataque somente se passou tempo suficiente desde o último ataque
-                enemy.last_attack_time = current_time  # Atualiza o tempo do último ataque
-                
-                enemy.atack()
-            
-        
-
-        if len(list_enemys) == 0:
-            mudanca(fase2,"Fase 2",pontos)
-
-
-        score = fonte_pequena.render(f"Score: {pontos}",True,(255,255,255))
-        vidas = fonte_pequena.render("Life:",True,(255,255,255))
-
-        
-  
-        janela.blit(player,jogador_rect)
-        janela.blit(score,(parede_esquerda +4,90))
-        janela.blit(vidas,(parede_esquerda +4,127))
-        jogador.update_life(list_enemys)
-
-        if jogador.life <=0:
-            game_over()
-
-        pygame.display.update()
-
-
-
-
-off()
