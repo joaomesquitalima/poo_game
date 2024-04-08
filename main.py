@@ -221,7 +221,6 @@ class Player():
         # Método para o jogador atirar
         laser_rect = laser.get_rect(center=(self.player_rect.x + 34, self.player_rect.y))
         
-        
         self.laser_list.append(laser_rect)  # Adiciona um novo tiro à lista
         fire.play()  # Reproduz o som de tiro
 
@@ -1080,4 +1079,5 @@ jogo = Jogo()
 
 if __name__ == "__main__":
     off()
+
 
