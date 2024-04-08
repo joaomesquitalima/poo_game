@@ -1,6 +1,5 @@
 import pygame,sys
-# import abc
-
+from abc import ABC, abstractmethod
 
 pygame.init()
 
@@ -11,6 +10,7 @@ pygame.joystick.init()
 # Verifique se há pelo menos um joystick conectado
 if pygame.joystick.get_count() == 0:
     print("Nenhum joystick encontrado. Certifique-se de que um controle de PS4 está conectado.")
+    
 else:
     # Configure o primeiro joystick (controle de PS4)
     controle_ps4 = pygame.joystick.Joystick(0)
@@ -157,7 +157,7 @@ class Boss(pygame.sprite.Sprite):
             self.lista_bullet.append(bullet)
 
 #interface enemy pra criar inimigos
-class Enemy():
+class Enemy(ABC):
     def __init__(self,img,x,y,life,velocidade):
         self.x = x
         self.y = y
@@ -167,8 +167,12 @@ class Enemy():
         self.img = pygame.transform.scale(self.img,(64,64))
         self.img_rect = self.img.get_rect(center=(x,y))
         self.vel_enemy = self.velocidade
+
+    @abstractmethod
     def atack(self):
         pass
+
+    @abstractmethod
     def move(self):
         pass
         
