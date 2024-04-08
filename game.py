@@ -17,12 +17,10 @@ else:
     controle_ps4 = pygame.joystick.Joystick(0)
     controle_ps4.init()
 
-# Defina um evento personalizado
-inicio_ataque= pygame.USEREVENT + 1
 
-pygame.time.set_timer(inicio_ataque, 5000)
-# Permitindo o tipo de evento personalizado
-pygame.event.set_allowed([inicio_ataque])
+
+enemy_atack = pygame.USEREVENT + 3
+pygame.time.set_timer(enemy_atack, 1000)
 
 
 parede_esquerda = 357
@@ -74,10 +72,6 @@ laser_rect = laser.get_rect()
 
 
 clock = pygame.time.Clock()
-
-
-enemy_atack = pygame.USEREVENT + 3
-pygame.time.set_timer(enemy_atack, 1000)
 
 
 class Boss(pygame.sprite.Sprite):
@@ -280,9 +274,9 @@ class Player():
                     self.laser_list.remove(rect)
                     esplosao.play()
 
-                for bullet in boss.lista_bullet:
-                    if bullet.colliderect(rect):
-                        boss.lista_bullet.remove(bullet)
+                # for bullet in boss.lista_bullet:
+                #     if bullet.colliderect(rect):
+                #         boss.lista_bullet.remove(bullet)
 
             for bullet in boss.lista_bullet:
                 if self.player_rect.colliderect(bullet):
@@ -419,13 +413,10 @@ def menu(pontos):
         if pygame.joystick.get_count() == 0:
             pass
         else:
-            botao_x = controle_ps4.get_button(0) 
-            up = controle_ps4.get_button(11)
-            square = controle_ps4.get_button(2)
-            
-            down = controle_ps4.get_button(12)
+            up = controle_ps4.get_button(11) #seta pra cima,ps4
+            down = controle_ps4.get_button(12) #seta pra baixo
 
-
+            #quando a seta pra cima for pressionada
             if up:
                 tempo_atual = pygame.time.get_ticks()
                 if tempo_atual - tempo_ultimo_evento > tempo_entre_eventos:
@@ -535,9 +526,9 @@ def tchau(pontos):
         if pygame.joystick.get_count() == 0:
             pass
         else:
-            botao_x = controle_ps4.get_button(0) 
+           
             up = controle_ps4.get_button(11)
-            square = controle_ps4.get_button(2)
+           
             
             down = controle_ps4.get_button(12)
 
@@ -589,13 +580,13 @@ def tchau(pontos):
                 if event.key == pygame.K_s:
                     menu_selection.play()
                     indice = indice +1
-                    if indice>=len(opcoes):
+                    if indice>=opcoes:
                         indice = 0
                 if event.key == pygame.K_w:
                     menu_selection.play()
                     indice = indice - 1
                     if indice <0:
-                        indice = len(opcoes)-1
+                        indice = opcoes-1
 
            
 
@@ -639,12 +630,10 @@ def fim():
                 sys.exit()
 
             if event.type == pygame.KEYDOWN:
-                
-                # mudanca(menu,"GAMER OVER",0)
                 menu(0)
 
-            if event.type == pygame.JOYBUTTONUP:
-                mudanca(menu,"ligando",0)
+            # if event.type == pygame.JOYBUTTONUP:
+            #     mudanca(menu,"ligando",0)
 
         start = fonte.render("FIM...",True,(255,255,255))
         start_rect = start.get_rect(center=(largura_janela/2,altura_janela/2))
@@ -690,7 +679,8 @@ class Fase1(Fase):
                     sys.exit()
 
                 if event.type == pygame.KEYDOWN:
-                    jogador.atacar()
+                    if event.key == pygame.K_SPACE:
+                        jogador.atacar()
 
                 if event.type == pygame.JOYBUTTONDOWN:
                     if controle_ps4.get_button(2):
@@ -765,7 +755,8 @@ class Fase2(Fase):
                     sys.exit()
 
                 if event.type == pygame.KEYDOWN:
-                    jogador.atacar()
+                    if event.key == pygame.K_SPACE:
+                        jogador.atacar()
 
                 if event.type == pygame.JOYBUTTONDOWN:
                     if controle_ps4.get_button(2):
@@ -841,7 +832,8 @@ class Fase3(Fase):
                     sys.exit()
 
                 if event.type == pygame.KEYDOWN:
-                    jogador.atacar()
+                    if event.key == pygame.K_SPACE:
+                        jogador.atacar()
 
                 if event.type == pygame.JOYBUTTONDOWN:
                     if controle_ps4.get_button(2):
@@ -914,7 +906,8 @@ class Fase4(Fase):
                     sys.exit()
 
                 if event.type == pygame.KEYDOWN:
-                    jogador.atacar()
+                    if event.key == pygame.K_SPACE:
+                        jogador.atacar()
 
                 if event.type == pygame.JOYBUTTONDOWN:
                     if controle_ps4.get_button(2):
@@ -967,6 +960,13 @@ class Final(Fase):
         #instanciando um objeto player
         jogador = Player(632,591)
         jogador.laser_list = []
+
+        # Defina um evento personalizado
+        inicio_ataque= pygame.USEREVENT + 1
+
+        pygame.time.set_timer(inicio_ataque, 5000)
+        # Permitindo o tipo de evento personalizado
+        pygame.event.set_allowed([inicio_ataque])
         
     
         pygame.mixer.music.load("audios/boss_music.mpeg")
@@ -1018,7 +1018,8 @@ class Final(Fase):
             
 
                 if event.type == pygame.KEYDOWN:
-                    jogador.atacar()
+                    if event.key == pygame.K_SPACE:
+                        jogador.atacar()
 
                 if event.type == pygame.JOYBUTTONDOWN:
                     if controle_ps4.get_button(2):
@@ -1074,6 +1075,8 @@ class Jogo:
 
 # Uso do padrão State para representar as fases do jogo
 jogo = Jogo()
+
+
 
 
 off()
