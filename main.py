@@ -1045,7 +1045,6 @@ def fase1(pontos):
         
 
         if len(list_enemys) == 0:
-         
             mudanca(fase2,"Fase 2",pontos)
 
 
