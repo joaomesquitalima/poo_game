@@ -488,6 +488,11 @@ def menu(pontos):
                 if controle_ps4.get_button(0) and indice == 0:
                     pygame.mixer.music.stop()
                     mudanca(fase1,"Fase 1",pontos)
+                
+                if controle_ps4.get_button(0) and indice == 2:
+                    cursor_select.play()
+                    tchau(pontos)
+
                     
 
             if event.type == pygame.KEYDOWN:
@@ -498,6 +503,7 @@ def menu(pontos):
                 if event.key == pygame.K_SPACE and indice == 2:
                     cursor_select.play()
                     tchau(pontos)
+
 
                 if event.key == pygame.K_s:
                     menu_selection.play()
@@ -544,18 +550,61 @@ def menu(pontos):
 
 def tchau(pontos):
     
-    opcoes = [0,1]
+    opcoes = 2
     indice = 0
     azul = (0,0,255)
     branco = (255,255,255)
+    tempo_entre_eventos = 200
+    tempo_ultimo_evento = 0
     while True:
         janela.fill((255,255,255))
         janela.blit(fundo,(0,0))
+
+
+
+        if pygame.joystick.get_count() == 0:
+            pass
+        else:
+            botao_x = controle_ps4.get_button(0) 
+            up = controle_ps4.get_button(11)
+            square = controle_ps4.get_button(2)
+            
+            down = controle_ps4.get_button(12)
+
+
+            if up:
+                tempo_atual = pygame.time.get_ticks()
+                if tempo_atual - tempo_ultimo_evento > tempo_entre_eventos:
+                    menu_selection.play()
+                    indice -= 1
+                    if indice < 0:
+                        indice = opcoes-1
+                    # Atualiza o tempo do último evento
+                    tempo_ultimo_evento = tempo_atual
+
+            if down:
+                tempo_atual = pygame.time.get_ticks()
+                if tempo_atual - tempo_ultimo_evento > tempo_entre_eventos:
+                    menu_selection.play()
+                    indice += 1
+                    if indice > opcoes-1:
+                        indice = 0
+                    # Atualiza o tempo do último evento
+                    tempo_ultimo_evento = tempo_atual
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
+            if event.type == pygame.JOYBUTTONDOWN:
+                if controle_ps4.get_button(0) and indice == 1:
+                    cursor_back.play()
+                    menu(pontos)
+                if controle_ps4.get_button(0) and indice == 0:
+                    cursor_select.play()
+                    pygame.quit()
+                    sys.exit()
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE and indice == 1:
@@ -577,6 +626,8 @@ def tchau(pontos):
                     indice = indice - 1
                     if indice <0:
                         indice = len(opcoes)-1
+
+           
 
         sim = fonte.render("Sim",True,branco)
         nao = fonte.render("Nao",True,branco)
@@ -691,13 +742,6 @@ def final(pontos):
                     jogador.atacar()
 
 
-        
-                
-
-        
-
-         
-
         #faz com que o jogador se mova
         jogador.move()
      
@@ -717,8 +761,6 @@ def final(pontos):
         
         
         janela.blit(player,jogador_rect)
-
-        
 
         
         vidas = fonte_pequena.render("Life:",True,(255,255,255))
@@ -764,10 +806,7 @@ def fase4(pontos):
                 if controle_ps4.get_button(2):
                     jogador.atacar()
 
-            
-            
 
-      
         jogador.move()
         jogador.draw()
         
@@ -840,9 +879,6 @@ def fase3(pontos):
                     jogador.atacar()
 
 
-            
-
-      
         jogador.move()
         jogador.draw()
         
@@ -913,10 +949,6 @@ def fase2(pontos):
                 if controle_ps4.get_button(2):
                     jogador.atacar()
 
-           
-
-            
-      
         jogador.move()
         jogador.draw()
         
@@ -987,12 +1019,6 @@ def fase1(pontos):
             if event.type == pygame.JOYBUTTONDOWN:
                 if controle_ps4.get_button(2):
                     jogador.atacar()
-
-
-            
-
-            
-
 
       
         jogador.move()
