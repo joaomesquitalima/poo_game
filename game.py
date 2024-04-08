@@ -143,7 +143,6 @@ class Boss(pygame.sprite.Sprite):
             # Executar ataque somente se passou tempo suficiente desde o último ataque
             self.last_attack_time = current_time  # Atualiza o tempo do último ataque
                 
-            
             if (x + 65) >= 810:
                 self.rect.x = x - 70
                 bullet = self.bullet.get_rect(center=(self.rect.x + 150, self.rect.y))
@@ -182,7 +181,7 @@ class Alien(Enemy):
         # Chama o construtor da classe pai para inicializar atributos comuns
         super().__init__(img, x, y, life, velocidade)
         self.lasers_list = []
-        self.laser = pygame.image.load("alien_laser.png").convert_alpha()
+        self.laser = pygame.image.load("imagens/alien_laser.png").convert_alpha()
         self.atack_time = atack_time
         self.last_attack_time = pygame.time.get_ticks() 
         
@@ -190,26 +189,19 @@ class Alien(Enemy):
         bullet = self.laser.get_rect(center=(self.img_rect.x + 40, self.img_rect.y+10))
         self.lasers_list.append(bullet)
 
-    
-        
-
     def move(self):
-
-        
         for bala in self.lasers_list:
-            
             bala.y += 10
             if bala.y > altura_janela - 150:
                 self.lasers_list.remove(bala)
                 
-
             janela.blit(self.laser,bala)
       
         if self.img_rect.x < parede_esquerda:
             self.vel_enemy = self.velocidade
             self.img_rect.y +=10
             
-            # pass
+     
         if self.img_rect.x > parede_direita:
             self.vel_enemy = -self.velocidade
             self.img_rect.y +=5
